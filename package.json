@@ -6,6 +6,7 @@
   "private": false,
   "scripts": {
     "start": "parcel app/index.html",
+    "build": "parcel build app/index.html",
     "test": "exit 0"
   },
   "dependencies": {
