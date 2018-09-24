@@ -1,7 +1,20 @@
 import Web3 from 'web3'
+import {
+  Asset,
+  Transaction,
+  TransactionOutput
+} from '@cryptoeconomicslab/plasma-chamber';
+const utils = require('ethereumjs-util');
+
+const privKey1 = new Buffer('e88e7cda6f7fae195d0dcda7ccb8d733b8e6bb9bd0bc4845e1093369b5dc2257', 'hex')
+const privKey2 = new Buffer('855364a82b6d1405211d4b47926f4aa9fa55175ab2deaf2774e28c2881189cff', 'hex')
+const testAddress1 = utils.privateToAddress(privKey1);
+const testAddress2 = utils.privateToAddress(privKey2);
+const zeroAddress = new Buffer("0000000000000000000000000000000000000000", 'hex');
 
 export const WEB3_CONNECTED = 'WEB3_CONNECTED';
 export const FETCH_BLOCK_NUMBER = 'FETCH_BLOCK_NUMBER';
+export const SEND_RAW_TRANSACTION = 'SEND_RAW_TRANSACTION';
 
 
 export function web3connect() {
@@ -32,6 +45,41 @@ export function fetchBlockNumber() {
       dispatch({
         type: FETCH_BLOCK_NUMBER,
         payload: blockNumber
+      });
+    });
+  };
+}
+
+export function sendRawTransaction() {
+  return (dispatch, getState) => {
+    const web3 = getState().web3;
+
+    const input = new TransactionOutput(
+      [testAddress1],
+      new Asset(zeroAddress, 2)
+    );
+    const output = new TransactionOutput(
+      [testAddress2],
+      new Asset(zeroAddress, 2)
+    );
+    const tx = new Transaction(
+      0,
+      [testAddress2],
+      new Date().getTime(),
+      [input],
+      [output]
+    );
+    const sign = tx.sign(privKey1)
+    tx.sigs.push(sign);
+    // include sigunatures
+    let txBytes = tx.getBytes(true);
+
+    const data = txBytes.toString('hex');
+    return web3.eth.sendSignedTransaction(data).then(transactionHash => {
+      console.log("sendRawTransaction: ", transactionHash);
+      dispatch({
+        type: SEND_RAW_TRANSACTION,
+        payload: transactionHash
       });
     });
   };
