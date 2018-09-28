@@ -51,7 +51,7 @@ export function fetchBlockNumber() {
 }
 
 export function sendRawTransaction() {
-  return (dispatch, getState) => {
+  return async (dispatch, getState) => {
     const web3 = getState().web3;
 
     const input = new TransactionOutput(
@@ -69,13 +69,22 @@ export function sendRawTransaction() {
       [input],
       [output]
     );
-    const sign = tx.sign(privKey1)
-    tx.sigs.push(sign);
-    // include sigunatures
-    let txBytes = tx.getBytes(true);
-
-    const data = txBytes.toString('hex');
-    return web3.eth.sendSignedTransaction(data).then(transactionHash => {
+    console.log('a');
+    let txBytes = tx.getBytes();
+    let accounts = await web3.eth.getAccounts();
+    console.log(accounts)
+    return web3.eth.sign(
+      utils.bufferToHex(txBytes),
+      accounts[0],
+    ).then((sign) => {
+      console.log('c');
+      tx.sigs.push(new Buffer(sign, 'hex'));
+      // include sigunatures
+      let signedTxBytes = tx.getBytes(true);
+  
+      const data = signedTxBytes.toString('hex');
+      return web3.eth.sendSignedTransaction(data);
+    }).then(transactionHash => {
       console.log("sendRawTransaction: ", transactionHash);
       dispatch({
         type: SEND_RAW_TRANSACTION,
