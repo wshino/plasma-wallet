@@ -6,11 +6,29 @@ import {
 import utils from 'ethereumjs-util';
 const BN = utils.BN
 
+fetch('http://localhost:3000', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },    
+    body: JSON.stringify({
+      "jsonrpc": "2.0",
+      "id": 6412,
+      "method": "chamber_block",
+      "params": [7]
+    })
+  })
+  .then(response => {
+    return response.text();
+  })
+  .then(body => {
+    console.log(body);
+  });
+
 const privKey1 = new Buffer('c87509a1c067bbde78beb793e6fa76530b6382a4c0241e5e4a9ec0a0f44dc0d3', 'hex')
 //const privKey2 = new Buffer('ae6ae8e5ccbfb04590405997ee2d52d2b330726137b875053c36d94e974d162f', 'hex')
 const testAddress1 = utils.privateToAddress(privKey1);
 //const testAddress2 = utils.privateToAddress(privKey2);
-const zeroAddress = new Buffer("0000000000000000000000000000000000000000", 'hex');
 
 export const WEB3_CONNECTED = 'WEB3_CONNECTED';
 export const FETCH_BLOCK_NUMBER = 'FETCH_BLOCK_NUMBER';
@@ -19,8 +37,8 @@ export const SEND_RAW_TRANSACTION = 'SEND_RAW_TRANSACTION';
 
 import RootChainArtifacts from '../assets/RootChain.json'
 
-const RootChainAddress = '0x345ca3e014aaf5dca488057592ee47305d9b3e10';
-const OperatorAddress = '0x627306090abab3a6e1400e9345bc60c78a8bef57';
+const RootChainAddress = process.env.ROOTCHAIN_ADDRESS || '0x345ca3e014aaf5dca488057592ee47305d9b3e10';
+const OperatorAddress = process.env.OPERATOR_ADDRESS || '0x627306090abab3a6e1400e9345bc60c78a8bef57';
 const user = '0x' + testAddress1.toString('hex');
 console.log(user);
 
