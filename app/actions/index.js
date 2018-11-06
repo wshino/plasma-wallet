@@ -4,26 +4,10 @@ import {
   TransactionOutput
 } from '@cryptoeconomicslab/plasma-chamber';
 import utils from 'ethereumjs-util';
+import ChildChainApi from '../helpers/childchain';
+const childChainApi = new ChildChainApi('http://localhost:3000');
 const BN = utils.BN
 
-fetch('http://localhost:3000', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },    
-    body: JSON.stringify({
-      "jsonrpc": "2.0",
-      "id": 6412,
-      "method": "chamber_block",
-      "params": [7]
-    })
-  })
-  .then(response => {
-    return response.text();
-  })
-  .then(body => {
-    console.log(body);
-  });
 
 const privKey1 = new Buffer('c87509a1c067bbde78beb793e6fa76530b6382a4c0241e5e4a9ec0a0f44dc0d3', 'hex')
 //const privKey2 = new Buffer('ae6ae8e5ccbfb04590405997ee2d52d2b330726137b875053c36d94e974d162f', 'hex')
@@ -32,6 +16,7 @@ const testAddress1 = utils.privateToAddress(privKey1);
 
 export const WEB3_CONNECTED = 'WEB3_CONNECTED';
 export const FETCH_BLOCK_NUMBER = 'FETCH_BLOCK_NUMBER';
+export const FETCH_BLOCK = 'FETCH_BLOCK';
 export const DEPOSITED = 'DEPOSITED';
 export const SEND_RAW_TRANSACTION = 'SEND_RAW_TRANSACTION';
 
@@ -76,14 +61,12 @@ export function web3connect() {
 
 export function fetchBlockNumber() {
   return (dispatch, getState) => {
-    const web3 = getState().web3;
-    return web3.eth.getBlockNumber().then(blockNumber => {
-      console.log("last block number: ", blockNumber);
+    childChainApi.request('eth_blockNumber').then((blockNumber) => {
       dispatch({
         type: FETCH_BLOCK_NUMBER,
-        payload: blockNumber
+        payload: blockNumber.result
       });
-    });
+    })
   };
 }
 
@@ -109,6 +92,23 @@ export function deposit() {
         payload: {}
       });
     });
+  };
+}
+
+export function fetchBlock() {
+  return (dispatch, getState) => {
+    childChainApi.request('eth_blockNumber').then((blockNumber) => {
+      dispatch({
+        type: FETCH_BLOCK_NUMBER,
+        payload: blockNumber.result
+      });
+      return childChainApi.request('eth_getBlockByNumber', [blockNumber.result])
+    }).then((block) => {
+      dispatch({
+        type: FETCH_BLOCK,
+        payload: block.result
+      });
+    })
   };
 }
 
