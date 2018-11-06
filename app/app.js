@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import {
   web3connect,
   fetchBlockNumber,
+  deposit,
   sendRawTransaction
 } from './actions';
 
@@ -27,6 +28,10 @@ class App extends Component {
     this.props.sendRawTransaction();
   }
 
+  deposit() {
+    this.props.deposit();
+  }
+
   render() {
     if (!this.props.web3) {
       return (
@@ -41,6 +46,9 @@ class App extends Component {
           <p>Block Number: {this.props.blockNumber}</p>
         </div>
         <div>
+          <button onClick={this.deposit.bind(this)}>Deposit 0.1ether</button>
+        </div>
+        <div>
           <button onClick={this.sendRawTransaction.bind(this)}>sendRawTransaction</button>
           <p>Tx Hash: {this.props.txResult}</p>
         </div>
@@ -52,11 +60,13 @@ class App extends Component {
 const mapDispatchToProps = {
   web3connect,
   fetchBlockNumber,
+  deposit,
   sendRawTransaction
 };
 
 const mapStateToProps = (state) => ({
   web3: state.web3,
+  web3Root: state.web3Root,
   blockNumber: state.blockNumber,
   txResult: state.txResult
 });

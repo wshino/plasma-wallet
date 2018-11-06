@@ -5,7 +5,6 @@ import thunk from 'redux-thunk'
 import { Provider } from 'react-redux'
 import reducers from './reducers';
 import App from './app'
-import Web3 from 'web3'
 
 let store = createStore(reducers, applyMiddleware(thunk));
 
