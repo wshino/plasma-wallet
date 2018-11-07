@@ -5,10 +5,10 @@ import {
 } from '@cryptoeconomicslab/plasma-chamber';
 import utils from 'ethereumjs-util';
 import ChildChainApi from '../helpers/childchain';
-const childChainApi = new ChildChainApi('http://localhost:3000');
+const childChainApi = new ChildChainApi(process.env.CHILDCHAIN_ENDPOINT || 'http://localhost:3000');
 const BN = utils.BN
 
-
+console.log(process.env.CHILDCHAIN_ENDPOINT, process.env.ROOTCHAIN_ADDRESS)
 const privKey1 = new Buffer('c87509a1c067bbde78beb793e6fa76530b6382a4c0241e5e4a9ec0a0f44dc0d3', 'hex')
 //const privKey2 = new Buffer('ae6ae8e5ccbfb04590405997ee2d52d2b330726137b875053c36d94e974d162f', 'hex')
 const testAddress1 = utils.privateToAddress(privKey1);
