@@ -4,23 +4,26 @@ import {
   TransactionOutput
 } from '@cryptoeconomicslab/plasma-chamber';
 import utils from 'ethereumjs-util';
+import ChildChainApi from '../helpers/childchain';
+const childChainApi = new ChildChainApi(process.env.CHILDCHAIN_ENDPOINT || 'http://localhost:3000');
 const BN = utils.BN
 
+console.log(process.env.CHILDCHAIN_ENDPOINT, process.env.ROOTCHAIN_ADDRESS)
 const privKey1 = new Buffer('c87509a1c067bbde78beb793e6fa76530b6382a4c0241e5e4a9ec0a0f44dc0d3', 'hex')
 //const privKey2 = new Buffer('ae6ae8e5ccbfb04590405997ee2d52d2b330726137b875053c36d94e974d162f', 'hex')
 const testAddress1 = utils.privateToAddress(privKey1);
 //const testAddress2 = utils.privateToAddress(privKey2);
-const zeroAddress = new Buffer("0000000000000000000000000000000000000000", 'hex');
 
 export const WEB3_CONNECTED = 'WEB3_CONNECTED';
 export const FETCH_BLOCK_NUMBER = 'FETCH_BLOCK_NUMBER';
+export const FETCH_BLOCK = 'FETCH_BLOCK';
 export const DEPOSITED = 'DEPOSITED';
 export const SEND_RAW_TRANSACTION = 'SEND_RAW_TRANSACTION';
 
 import RootChainArtifacts from '../assets/RootChain.json'
 
-const RootChainAddress = '0x345ca3e014aaf5dca488057592ee47305d9b3e10';
-const OperatorAddress = '0x627306090abab3a6e1400e9345bc60c78a8bef57';
+const RootChainAddress = process.env.ROOTCHAIN_ADDRESS || '0x345ca3e014aaf5dca488057592ee47305d9b3e10';
+const OperatorAddress = process.env.OPERATOR_ADDRESS || '0x627306090abab3a6e1400e9345bc60c78a8bef57';
 const user = '0x' + testAddress1.toString('hex');
 console.log(user);
 
@@ -58,14 +61,12 @@ export function web3connect() {
 
 export function fetchBlockNumber() {
   return (dispatch, getState) => {
-    const web3 = getState().web3;
-    return web3.eth.getBlockNumber().then(blockNumber => {
-      console.log("last block number: ", blockNumber);
+    childChainApi.request('eth_blockNumber').then((blockNumber) => {
       dispatch({
         type: FETCH_BLOCK_NUMBER,
-        payload: blockNumber
+        payload: blockNumber.result
       });
-    });
+    })
   };
 }
 
@@ -91,6 +92,23 @@ export function deposit() {
         payload: {}
       });
     });
+  };
+}
+
+export function fetchBlock() {
+  return (dispatch, getState) => {
+    childChainApi.request('eth_blockNumber').then((blockNumber) => {
+      dispatch({
+        type: FETCH_BLOCK_NUMBER,
+        payload: blockNumber.result
+      });
+      return childChainApi.request('eth_getBlockByNumber', [blockNumber.result])
+    }).then((block) => {
+      dispatch({
+        type: FETCH_BLOCK,
+        payload: block.result
+      });
+    })
   };
 }
 
