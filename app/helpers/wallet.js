@@ -79,7 +79,12 @@ export default class PlasmaWallet {
       return acc.concat(tx.outputs);
     }, []).filter(filterOwner).forEach((utxo) => {
       const key = utils.sha3(JSON.stringify(utxo)).toString('hex');
-      this.utxos[key] = utxo;
+      this.utxos[key] = {
+        owners: utxo.owners,
+        value: utxo.value,
+        state: utxo.state,
+        blkNum: block.number
+      }
     })
     Storage.store('utxo', this.utxos);
   }
