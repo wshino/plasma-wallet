@@ -106,12 +106,12 @@ export function deposit() {
 
 export function fetchBlock() {
   return (dispatch, getState) => {
-    childChainApi.request('eth_blockNumber').then((blockNumber) => {
+    childChainApi.getBlockNumber().then((blockNumber) => {
       dispatch({
         type: FETCH_BLOCK_NUMBER,
         payload: blockNumber.result
       });
-      return childChainApi.request('eth_getBlockByNumber', [blockNumber.result])
+      return childChainApi.getBlockByNumber(blockNumber.result);
     }).then((block) => {
       dispatch({
         type: FETCH_BLOCK,

@@ -48,10 +48,9 @@ class App extends Component {
         <div> Loading web3 </div>
       );
     }
-    console.log(this.props.utxos)
     return (
       <div>
-        Hello, World!
+        Plasma Sample Wallet!!
         <div>
           <button onClick={this.fetchBlockNumber.bind(this)}>fetchBlockNumber</button>
           <p>Block Number: {this.props.blockNumber}</p>

@@ -4,6 +4,15 @@ export class ChildChainApi {
     this.id = 1;
     this.endpoint = endpoint;
   }
+
+  getBlockNumber() {
+    return this.request('eth_blockNumber')
+  }
+
+  getBlockByNumber(blockNumber) {
+    return this.request('eth_getBlockByNumber', [blockNumber])
+  }
+
   request(methodName, args) {
     this.id++;
     return fetch(this.endpoint, {

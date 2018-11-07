@@ -19,11 +19,11 @@ export default class PlasmaWallet {
    * @dev update UTXO and proof.
    */
   update() {
-    return this.childChainApi.request('eth_blockNumber').then((blockNumber) => {
+    return this.childChainApi.getBlockNumber().then((blockNumber) => {
       this.latestBlockNumber = blockNumber.result;
       let tasks = []
       for(let i = this.loadedBlockNumber + 1;i <= this.latestBlockNumber;i++) {
-        tasks.push(this.childChainApi.request('eth_getBlockByNumber', [i]));
+        tasks.push(this.childChainApi.getBlockByNumber(i));
       }
       return Promise.all(tasks);
     }).then((responses) => {
