@@ -12,11 +12,6 @@ const childChainApi = new ChildChainApi(process.env.CHILDCHAIN_ENDPOINT || 'http
 
 const BN = utils.BN
 
-console.log(process.env.CHILDCHAIN_ENDPOINT, process.env.ROOTCHAIN_ADDRESS)
-const privKey1 = new Buffer('c87509a1c067bbde78beb793e6fa76530b6382a4c0241e5e4a9ec0a0f44dc0d3', 'hex')
-//const privKey2 = new Buffer('ae6ae8e5ccbfb04590405997ee2d52d2b330726137b875053c36d94e974d162f', 'hex')
-const testAddress1 = utils.privateToAddress(privKey1);
-//const testAddress2 = utils.privateToAddress(privKey2);
 
 export const WEB3_CONNECTED = 'WEB3_CONNECTED';
 export const FETCH_BLOCK_NUMBER = 'FETCH_BLOCK_NUMBER';
@@ -29,42 +24,18 @@ import RootChainArtifacts from '../assets/RootChain.json'
 
 const RootChainAddress = process.env.ROOTCHAIN_ADDRESS || '0x345ca3e014aaf5dca488057592ee47305d9b3e10';
 const OperatorAddress = process.env.OPERATOR_ADDRESS || '0x627306090abab3a6e1400e9345bc60c78a8bef57';
-const user = '0x' + testAddress1.toString('hex');
-console.log(user);
 
 export function web3connect() {
   return (dispatch) => {
-    const web3 = window.web3;
-    if (typeof web3 !== 'undefined') {
-      const web3tmp = new Web3(web3.currentProvider);
-      web3tmp.eth.getAccounts().then((accounts) => {
-        const wallet = new PlasmaWallet(accounts[0]);
-        dispatch({
-          type: WEB3_CONNECTED,
-          payload: {
-            web3: web3tmp,
-            web3Root: web3tmp,
-            wallet: wallet
-          }
-        });
-      });
-    }else{
-      const web3 = new Web3(new Web3.providers.HttpProvider(
-        process.env.ENDPOINT || 'http://127.0.0.1:3000'
-      ));
-      const web3Root = new Web3(new Web3.providers.HttpProvider(
-        process.env.ENDPOINT || 'http://127.0.0.1:8545'
-      ));
-//      web3Root.eth.defaultAccount = user;
-//      web3Root.eth.accounts.wallet.add(wallet.getPrivateKeyString());
+    const wallet = new PlasmaWallet();
+    wallet.initWeb3().then(() => {
       dispatch({
         type: WEB3_CONNECTED,
         payload: {
-          web3,
-          web3Root
+          wallet: wallet
         }
       });
-    }
+    });
   };
 }
 
@@ -81,7 +52,7 @@ export function fetchBlockNumber() {
 
 export function deposit() {
   return (dispatch, getState) => {
-    const web3 = getState().web3Root;
+    const web3 = getState().wallet.web3;
     var rootChainContract = new web3.eth.Contract(
       RootChainArtifacts.abi,
       RootChainAddress
@@ -136,7 +107,7 @@ export function updateUTXO() {
 
 export function sendRawTransaction() {
   return (dispatch, getState) => {
-    const web3 = getState().web3;
+    const web3 = getState().wallet.web3Child;
 
     const input = new TransactionOutput(
       [testAddress1],

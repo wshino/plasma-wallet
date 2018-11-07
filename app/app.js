@@ -43,9 +43,9 @@ class App extends Component {
   }
 
   render() {
-    if (!this.props.web3) {
+    if (!this.props.wallet) {
       return (
-        <div> Loading web3 </div>
+        <div> Loading wallet </div>
       );
     }
     return (
@@ -95,8 +95,7 @@ const mapDispatchToProps = {
 };
 
 const mapStateToProps = (state) => ({
-  web3: state.web3,
-  web3Root: state.web3Root,
+  wallet: state.wallet,
   blockNumber: state.blockNumber,
   block: state.block,
   utxos: state.utxos,

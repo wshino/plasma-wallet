@@ -12,8 +12,6 @@ const reducer = (state = defaultState, action) => {
   switch (action.type) {
   case WEB3_CONNECTED:
     return Object.assign({}, state, {
-      web3: action.payload.web3,
-      web3Root: action.payload.web3Root,
       wallet: action.payload.wallet
     });
   case FETCH_BLOCK_NUMBER:
