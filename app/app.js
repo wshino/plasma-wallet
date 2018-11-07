@@ -68,6 +68,10 @@ class App extends Component {
           {this.props.utxos ? this.props.utxos.map(utxo => {
             return (JSON.stringify(utxo.value))
           }) : null}
+          <p>balance</p>
+          {this.props.utxos ? (this.props.utxos.filter(utxo => {
+            return utxo.state.length == 0 || utxo.state[0] === 0;
+          }).length * 0.1) : null}
         </div>
         <div>
           <button onClick={this.deposit.bind(this)}>Deposit 0.1ether</button>
