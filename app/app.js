@@ -4,6 +4,7 @@ import {
   web3connect,
   fetchBlockNumber,
   fetchBlock,
+  updateUTXO,
   deposit,
   sendRawTransaction
 } from './actions';
@@ -29,6 +30,10 @@ class App extends Component {
     this.props.fetchBlock();
   }
 
+  updateUTXO() {
+    this.props.updateUTXO();
+  }
+  
   sendRawTransaction() {
     this.props.sendRawTransaction();
   }
@@ -43,6 +48,7 @@ class App extends Component {
         <div> Loading web3 </div>
       );
     }
+    console.log(this.props.utxos)
     return (
       <div>
         Hello, World!
@@ -55,6 +61,13 @@ class App extends Component {
           <p>Block</p>
           {this.props.block ? this.props.block.txs.map(tx => {
             return (JSON.stringify(tx))
+          }) : null}
+        </div>
+        <div>
+          <button onClick={this.updateUTXO.bind(this)}>updateUTXOs</button>
+          <p>UTXO List</p>
+          {this.props.utxos ? this.props.utxos.map(utxo => {
+            return (JSON.stringify(utxo.value))
           }) : null}
         </div>
         <div>
@@ -73,6 +86,7 @@ const mapDispatchToProps = {
   web3connect,
   fetchBlockNumber,
   fetchBlock,
+  updateUTXO,
   deposit,
   sendRawTransaction
 };
@@ -82,6 +96,7 @@ const mapStateToProps = (state) => ({
   web3Root: state.web3Root,
   blockNumber: state.blockNumber,
   block: state.block,
+  utxos: state.utxos,
   txResult: state.txResult
 });
 

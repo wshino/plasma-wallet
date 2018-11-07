@@ -4,8 +4,12 @@ import {
   TransactionOutput
 } from '@cryptoeconomicslab/plasma-chamber';
 import utils from 'ethereumjs-util';
+
 import ChildChainApi from '../helpers/childchain';
+import PlasmaWallet from '../helpers/wallet';
+
 const childChainApi = new ChildChainApi(process.env.CHILDCHAIN_ENDPOINT || 'http://localhost:3000');
+
 const BN = utils.BN
 
 console.log(process.env.CHILDCHAIN_ENDPOINT, process.env.ROOTCHAIN_ADDRESS)
@@ -17,6 +21,7 @@ const testAddress1 = utils.privateToAddress(privKey1);
 export const WEB3_CONNECTED = 'WEB3_CONNECTED';
 export const FETCH_BLOCK_NUMBER = 'FETCH_BLOCK_NUMBER';
 export const FETCH_BLOCK = 'FETCH_BLOCK';
+export const UPDATE_UTXO = 'UPDATE_UTXO';
 export const DEPOSITED = 'DEPOSITED';
 export const SEND_RAW_TRANSACTION = 'SEND_RAW_TRANSACTION';
 
@@ -32,12 +37,16 @@ export function web3connect() {
     const web3 = window.web3;
     if (typeof web3 !== 'undefined') {
       const web3tmp = new Web3(web3.currentProvider);
-      dispatch({
-        type: WEB3_CONNECTED,
-        payload: {
-          web3: web3tmp,
-          web3Root: web3tmp
-        }
+      web3tmp.eth.getAccounts().then((accounts) => {
+        const wallet = new PlasmaWallet(accounts[0]);
+        dispatch({
+          type: WEB3_CONNECTED,
+          payload: {
+            web3: web3tmp,
+            web3Root: web3tmp,
+            wallet: wallet
+          }
+        });
       });
     }else{
       const web3 = new Web3(new Web3.providers.HttpProvider(
@@ -107,6 +116,19 @@ export function fetchBlock() {
       dispatch({
         type: FETCH_BLOCK,
         payload: block.result
+      });
+    })
+  };
+}
+
+export function updateUTXO() {
+  return (dispatch, getState) => {
+    const wallet = getState().wallet;
+    wallet.update().then(utxos => {
+      console.log(utxos);
+      dispatch({
+        type: UPDATE_UTXO,
+        payload: utxos
       });
     })
   };
