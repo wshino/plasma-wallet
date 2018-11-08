@@ -23,7 +23,7 @@ const reducer = (state = defaultState, action) => {
   case SEND_RAW_TRANSACTION:
     return Object.assign({}, state, {txResult: action.payload});
   default:
-    return state
+    return state;
   }
 };
 
