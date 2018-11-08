@@ -4,6 +4,7 @@ import {
   web3connect,
   fetchBlockNumber,
   fetchBlock,
+  updateUTXO,
   deposit,
   sendRawTransaction
 } from './actions';
@@ -29,6 +30,10 @@ class App extends Component {
     this.props.fetchBlock();
   }
 
+  updateUTXO() {
+    this.props.updateUTXO();
+  }
+  
   sendRawTransaction() {
     this.props.sendRawTransaction();
   }
@@ -38,14 +43,14 @@ class App extends Component {
   }
 
   render() {
-    if (!this.props.web3) {
+    if (!this.props.wallet) {
       return (
-        <div> Loading web3 </div>
+        <div> Loading wallet </div>
       );
     }
     return (
       <div>
-        Hello, World!
+        Plasma Sample Wallet!!
         <div>
           <button onClick={this.fetchBlockNumber.bind(this)}>fetchBlockNumber</button>
           <p>Block Number: {this.props.blockNumber}</p>
@@ -56,6 +61,17 @@ class App extends Component {
           {this.props.block ? this.props.block.txs.map(tx => {
             return (JSON.stringify(tx))
           }) : null}
+        </div>
+        <div>
+          <button onClick={this.updateUTXO.bind(this)}>updateUTXOs</button>
+          <p>UTXO List</p>
+          {this.props.utxos ? this.props.utxos.map(utxo => {
+            return (JSON.stringify(utxo.value))
+          }) : null}
+          <p>balance</p>
+          {this.props.utxos ? (this.props.utxos.filter(utxo => {
+            return utxo.state.length == 0 || utxo.state[0] === 0;
+          }).length * 0.1) : null}
         </div>
         <div>
           <button onClick={this.deposit.bind(this)}>Deposit 0.1ether</button>
@@ -73,15 +89,16 @@ const mapDispatchToProps = {
   web3connect,
   fetchBlockNumber,
   fetchBlock,
+  updateUTXO,
   deposit,
   sendRawTransaction
 };
 
 const mapStateToProps = (state) => ({
-  web3: state.web3,
-  web3Root: state.web3Root,
+  wallet: state.wallet,
   blockNumber: state.blockNumber,
   block: state.block,
+  utxos: state.utxos,
   txResult: state.txResult
 });
 
