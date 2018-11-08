@@ -129,7 +129,7 @@ export function transfer(utxo, toAddress) {
       [input],
       [output]
     );
-    const sign = tx.sign(wallet.privKey)
+    const sign = wallet.sign(tx);
     tx.sigs.push(sign);
     // include sigunatures
     let txBytes = tx.getBytes(true);
