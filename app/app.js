@@ -6,9 +6,10 @@ import {
   fetchBlock,
   updateUTXO,
   deposit,
-  sendRawTransaction
+  transfer
 } from './actions';
-
+import Styles from './style.css';
+console.log(Styles)
 class App extends Component {
   constructor(props) {
     super(props)
@@ -34,12 +35,21 @@ class App extends Component {
     this.props.updateUTXO();
   }
   
-  sendRawTransaction() {
-    this.props.sendRawTransaction();
+  transfer() {
+    const utxo = this.props.utxos[0];
+    if(utxo) {
+      this.props.transfer(
+        utxo,
+        this.state.toAddress);
+    }
   }
 
   deposit() {
     this.props.deposit();
+  }
+
+  onAddressChange(e) {
+    this.setState({toAddress: e.target.value})
   }
 
   render() {
@@ -77,8 +87,14 @@ class App extends Component {
           <button onClick={this.deposit.bind(this)}>Deposit 0.1ether</button>
         </div>
         <div>
-          <button onClick={this.sendRawTransaction.bind(this)}>sendRawTransaction(not implemented)</button>
-          <p>Tx Hash: {this.props.txResult}</p>
+          <div>
+            <span>To Address: </span>
+            <input 
+              className={Styles['form-input-address']}
+              onChange={this.onAddressChange.bind(this)}
+            />
+          </div>
+          <button onClick={this.transfer.bind(this)}>transfer</button>
         </div>
       </div>
     );
@@ -91,7 +107,7 @@ const mapDispatchToProps = {
   fetchBlock,
   updateUTXO,
   deposit,
-  sendRawTransaction
+  transfer
 };
 
 const mapStateToProps = (state) => ({
