@@ -79,7 +79,7 @@ export default class PlasmaWallet {
     block.txs.reduce((acc, tx) => {
       return acc.concat(tx.inputs);
     }, []).filter(filterOwner).forEach((spentUTXO) => {
-      const key = getUTXOKey({
+      const key = PlasmaWallet.getUTXOKey({
         owners: spentUTXO.owners,
         value: spentUTXO.value,
         state: spentUTXO.state,
@@ -96,7 +96,7 @@ export default class PlasmaWallet {
         state: utxo.state,
         blkNum: block.number
       };
-      const key = getUTXOKey(data);
+      const key = PlasmaWallet.getUTXOKey(data);
       this.utxos[key] = data;
     });
     Storage.store('utxo', this.utxos);
@@ -107,7 +107,7 @@ export default class PlasmaWallet {
    * @param {Transaction} tx
    */
   sign(tx) {
-    tx.sign(this.privKey);
+    return tx.sign(this.privKey);
   }
 
   /**
