@@ -104,6 +104,47 @@ export function updateUTXO() {
   };
 }
 
+
+export function transfer(utxo, toAddress) {
+  toAddress = new Buffer(toAddress, 'hex');
+  return (dispatch, getState) => {
+    console.log(utxo)
+    const wallet = getState().wallet;
+    const input = new TransactionOutput(
+      utxo.owners,
+      utxo.value.map(s=>parseInt(s)),
+      utxo.state,
+      utxo.blkNum
+    );
+    console.log(input, toAddress);
+    const output = new TransactionOutput(
+      [toAddress],
+      utxo.value.map(s=>parseInt(s)),
+      [0]
+    );
+    const tx = new Transaction(
+      0,
+      [toAddress],
+      new Date().getTime(),
+      [input],
+      [output]
+    );
+    const sign = tx.sign(wallet.privKey)
+    tx.sigs.push(sign);
+    // include sigunatures
+    let txBytes = tx.getBytes(true);
+
+    const data = txBytes.toString('hex');
+    return childChainApi.sendRawTransaction(data).then(transactionHash => {
+      console.log("sendRawTransaction: ", transactionHash);
+      dispatch({
+        type: SEND_RAW_TRANSACTION,
+        payload: transactionHash
+      });
+    });
+  };
+}
+
 export function sendRawTransaction() {
   return (dispatch, getState) => {
     const web3 = getState().wallet.web3Child;

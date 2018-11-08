@@ -13,6 +13,10 @@ export class ChildChainApi {
     return this.request('eth_getBlockByNumber', [blockNumber]);
   }
 
+  sendRawTransaction(data) {
+    return this.request('eth_sendRawTransaction', [data]);
+  }
+  
   request(methodName, args) {
     this.id++;
     return fetch(this.endpoint, {

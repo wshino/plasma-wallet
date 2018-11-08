@@ -11,7 +11,7 @@
     "lint": "eslint app"
   },
   "dependencies": {
-    "@cryptoeconomicslab/plasma-chamber": "^0.0.7",
+    "@cryptoeconomicslab/plasma-chamber": "^0.0.8",
     "babel-core": "^6.26.3",
     "babel-loader": "^8.0.2",
     "babel-plugin-transform-react-jsx": "^6.24.1",
@@ -21,6 +21,7 @@
     "ethereumjs-util": "^5.2.0",
     "ethereumjs-wallet": "^0.6.2",
     "parcel-bundler": "^1.9.7",
+    "postcss-modules": "^1.4.1",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
     "react-redux": "^5.0.7",

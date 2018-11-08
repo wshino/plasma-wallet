@@ -2,6 +2,7 @@ import Web3 from 'web3'
 import ChildChainApi from '../helpers/childchain';
 import Storage from './storage';
 import utils from 'ethereumjs-util';
+import { log } from 'async';
 
 /**
  * Plasma wallet store UTXO and proof
@@ -17,11 +18,19 @@ export default class PlasmaWallet {
 
   initWeb3() {
     const web3 = window.web3;
+    const privateKeyHex = Storage.load('privateKey') || 'c87509a1c067bbde78beb793e6fa76530b6382a4c0241e5e4a9ec0a0f44dc0d3';
+    this.privKey = new Buffer(privateKeyHex, 'hex')
     if (typeof web3 !== 'undefined') {
       // MetaMask
       const web3tmp = new Web3(web3.currentProvider);
       this.web3 = web3tmp;
       this.web3Child = web3tmp;
+      return this.web3.eth.getAccounts().then(accounts => {
+        this.address = accounts[0];
+        return new Promise((resolve, reject) => {
+          resolve(this);
+        })
+      });
     }else{
       // Mobile
       const web3 = new Web3(new Web3.providers.HttpProvider(
@@ -30,20 +39,17 @@ export default class PlasmaWallet {
       const web3Root = new Web3(new Web3.providers.HttpProvider(
         process.env.ROOTCHAIN_ENDPOINT || 'http://localhost:8545'
       ));
-      const privateKeyHex = Storage.load('privateKey') || 'c87509a1c067bbde78beb793e6fa76530b6382a4c0241e5e4a9ec0a0f44dc0d3';
-      const privKey = new Buffer(privateKeyHex, 'hex')
-      const address = utils.privateToAddress(privKey);
+      const address = utils.privateToAddress(this.privKey);
       web3Root.eth.defaultAccount = utils.bufferToHex(address)
-      web3Root.eth.accounts.wallet.add(utils.bufferToHex(privKey));
+      web3Root.eth.accounts.wallet.add(utils.bufferToHex(this.privKey));
+      console.log(utils.bufferToHex(address));
       this.web3 = web3Root;
       this.web3Child = web3;
-    }
-    return this.web3.eth.getAccounts().then(accounts => {
-      this.address = accounts[0];
+      this.address = utils.toChecksumAddress(utils.bufferToHex(address));
       return new Promise((resolve, reject) => {
         resolve(this);
       })
-    });
+    }
   }
 
   /**
@@ -67,24 +73,35 @@ export default class PlasmaWallet {
   updateBlock(res) {
     const block = res.result;
     const filterOwner = (o) => {
-      return o.owners.indexOf(this.address) >= 0;
+      const r = o.owners.map(ownerAddress => {
+        return utils.toChecksumAddress(ownerAddress);
+      });
+      console.log(r, this.address);
+      return r.indexOf(this.address) >= 0;
     }
     block.txs.reduce((acc, tx) => {
       return acc.concat(tx.inputs);
     }, []).filter(filterOwner).forEach((spentUTXO) => {
-      const key = utils.sha3(JSON.stringify(spentUTXO)).toString('hex');
+      const data = {
+        owners: spentUTXO.owners,
+        value: spentUTXO.value,
+        state: spentUTXO.state,
+        blkNum: spentUTXO.blkNum
+      }
+      const key = utils.sha3(JSON.stringify(data)).toString('hex');
       delete this.utxos[key];
     })
     block.txs.reduce((acc, tx) => {
       return acc.concat(tx.outputs);
     }, []).filter(filterOwner).forEach((utxo) => {
-      const key = utils.sha3(JSON.stringify(utxo)).toString('hex');
-      this.utxos[key] = {
+      const data = {
         owners: utxo.owners,
         value: utxo.value,
         state: utxo.state,
         blkNum: block.number
       }
+      const key = utils.sha3(JSON.stringify(data)).toString('hex');
+      this.utxos[key] = data;
     })
     Storage.store('utxo', this.utxos);
   }
