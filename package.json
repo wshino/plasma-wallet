@@ -7,7 +7,8 @@
   "scripts": {
     "start": "parcel app/index.html",
     "build": "ENDPOINT=https://plasma-chamber.herokuapp.com parcel build app/index.html",
-    "test": "exit 0"
+    "test": "exit 0",
+    "lint": "eslint app"
   },
   "dependencies": {
     "@cryptoeconomicslab/plasma-chamber": "^0.0.7",
@@ -15,6 +16,8 @@
     "babel-loader": "^8.0.2",
     "babel-plugin-transform-react-jsx": "^6.24.1",
     "bip39": "^2.5.0",
+    "eslint": "^5.8.0",
+    "eslint-plugin-react": "^7.11.1",
     "ethereumjs-util": "^5.2.0",
     "ethereumjs-wallet": "^0.6.2",
     "parcel-bundler": "^1.9.7",
