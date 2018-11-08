@@ -6,11 +6,11 @@ export class ChildChainApi {
   }
 
   getBlockNumber() {
-    return this.request('eth_blockNumber')
+    return this.request('eth_blockNumber');
   }
 
   getBlockByNumber(blockNumber) {
-    return this.request('eth_getBlockByNumber', [blockNumber])
+    return this.request('eth_getBlockByNumber', [blockNumber]);
   }
 
   request(methodName, args) {
@@ -21,15 +21,15 @@ export class ChildChainApi {
         'Content-Type': 'application/json'
       },    
       body: JSON.stringify({
-        "jsonrpc": "2.0",
-        "id": this.id,
-        "method": methodName,
-        "params": args
+        'jsonrpc': '2.0',
+        'id': this.id,
+        'method': methodName,
+        'params': args
       })
     })
-    .then(response => {
-      return response.json();
-    })
+      .then(response => {
+        return response.json();
+      });
   }
 }
 

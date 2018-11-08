@@ -1,4 +1,3 @@
-import Web3 from 'web3'
 import {
   Transaction,
   TransactionOutput
@@ -20,7 +19,7 @@ export const UPDATE_UTXO = 'UPDATE_UTXO';
 export const DEPOSITED = 'DEPOSITED';
 export const SEND_RAW_TRANSACTION = 'SEND_RAW_TRANSACTION';
 
-import RootChainArtifacts from '../assets/RootChain.json'
+import RootChainArtifacts from '../assets/RootChain.json';
 
 const RootChainAddress = process.env.ROOTCHAIN_ADDRESS || '0x345ca3e014aaf5dca488057592ee47305d9b3e10';
 const OperatorAddress = process.env.OPERATOR_ADDRESS || '0x627306090abab3a6e1400e9345bc60c78a8bef57';
