@@ -1,4 +1,9 @@
 import Web3 from 'web3';
+import {
+  Block,
+  Transaction,
+  TransactionOutput
+} from '@cryptoeconomicslab/plasma-chamber';
 import ChildChainApi from '../helpers/childchain';
 import Storage from './storage';
 import utils from 'ethereumjs-util';
@@ -70,13 +75,16 @@ export default class PlasmaWallet {
 
   updateBlock(res) {
     const block = res.result;
+    const transactions = block.txs.map(tx => {
+      return Transaction.fromBytes(new Buffer(tx, 'hex'));
+    });
     const filterOwner = (o) => {
       const r = o.owners.map(ownerAddress => {
         return utils.toChecksumAddress(ownerAddress);
       });
       return r.indexOf(this.address) >= 0;
     };
-    block.txs.reduce((acc, tx) => {
+    transactions.reduce((acc, tx) => {
       return acc.concat(tx.inputs);
     }, []).filter(filterOwner).forEach((spentUTXO) => {
       const key = PlasmaWallet.getUTXOKey({
@@ -87,7 +95,7 @@ export default class PlasmaWallet {
       });
       delete this.utxos[key];
     });
-    block.txs.reduce((acc, tx) => {
+    transactions.reduce((acc, tx) => {
       return acc.concat(tx.outputs);
     }, []).filter(filterOwner).forEach((utxo) => {
       const data = {
@@ -98,8 +106,20 @@ export default class PlasmaWallet {
       };
       const key = PlasmaWallet.getUTXOKey(data);
       this.utxos[key] = data;
+      Storage.store('proof.' + key + '.' + block.number, this.calProof(block, data));
     });
     Storage.store('utxo', this.utxos);
+  }
+
+  calProof(blockJson, utxo) {
+    const block = new Block(blockJson.number);
+    const transactions = block.txs.map(tx => {
+      return Transaction.fromBytes(new Buffer(tx, 'hex'));
+    });
+    transactions.forEach(tx => {
+      block.appendTx(tx);
+    });
+    return block.createTXOProof(utxo).toString('hex');
   }
 
   /**
