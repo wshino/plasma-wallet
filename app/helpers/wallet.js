@@ -106,7 +106,10 @@ export default class PlasmaWallet {
       };
       const key = PlasmaWallet.getUTXOKey(data);
       this.utxos[key] = data;
-      Storage.store('proof.' + key + '.' + block.number, this.calProof(block, data));
+    });
+    // non-inclusion proof
+    Object.keys(this.utxos).forEach(key => {
+      Storage.store('proof.' + key + '.' + block.number, this.calProof(block, this.utxos[key]));
     });
     Storage.store('utxo', this.utxos);
   }
