@@ -5,9 +5,25 @@ input {
 .form-input-address {
   border: 0;
   padding: 2px;
-  font-size: 1.3em;
+  font-size: 1.0em;
   color: #aaa;
   border: solid 1px #ccc;
   margin: 0 0 20px;
-  width: 240px;
+  width: 300px;
+}
+
+.form-address {
+  border: 0;
+  padding: 2px;
+  font-size: 1.0em;
+  color: #333;
+  border: solid 1px #ccc;
+  margin: 0 0 20px;
+  width: 380px;
+}
+
+.container {
+  background-color: #ccc;
+  padding: 10px;
+  margin: 10px;
 }

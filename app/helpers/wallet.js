@@ -19,6 +19,10 @@ export default class PlasmaWallet {
     this.address = null;
   }
 
+  getAddress() {
+    return this.address;
+  }
+
   initWeb3() {
     const web3 = window.web3;
     const privateKeyHex = Storage.load('privateKey') || 'c87509a1c067bbde78beb793e6fa76530b6382a4c0241e5e4a9ec0a0f44dc0d3';
