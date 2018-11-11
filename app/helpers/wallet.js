@@ -5,7 +5,10 @@ import {
   TransactionOutput
 } from '@cryptoeconomicslab/plasma-chamber';
 import ChildChainApi from '../helpers/childchain';
-import Storage from './storage';
+import {
+  BigStorage,
+  Storage
+} from './storage';
 import utils from 'ethereumjs-util';
 
 /**
@@ -16,12 +19,14 @@ export default class PlasmaWallet {
     this.childChainApi = new ChildChainApi(process.env.CHILDCHAIN_ENDPOINT || 'http://localhost:3000');
     // what we have
     this.utxos = Storage.load('utxo') || {};
+    this.bigStorage = new BigStorage();
     this.latestBlockNumber = 0;
     this.loadedBlockNumber = Storage.load('loadedBlockNumber') || 0;
     // privKey is Buffer
     this.privKey = null;
     // address is hex string and checksum address
     this.address = null;
+    this.zeroHash = utils.sha3(0).toString('hex');
   }
 
   initWeb3() {
@@ -93,23 +98,45 @@ export default class PlasmaWallet {
         state: spentUTXO.state,
         blkNum: spentUTXO.blkNum
       });
+      console.log('delete', spentUTXO.blkNum, block.number, spentUTXO.value);
       delete this.utxos[key];
     });
-    transactions.reduce((acc, tx) => {
-      return acc.concat(tx.outputs);
-    }, []).filter(filterOwner).forEach((utxo) => {
-      const data = {
-        owners: utxo.owners,
-        value: utxo.value,
-        state: utxo.state,
-        blkNum: block.number
-      };
-      const key = PlasmaWallet.getUTXOKey(data);
-      this.utxos[key] = data;
+    let newTx = {};
+    transactions.forEach(tx => {
+      tx.outputs.filter(filterOwner).forEach(utxo => {
+        const data = {
+          owners: utxo.owners,
+          value: utxo.value,
+          state: utxo.state,
+          blkNum: block.number
+        };
+        const key = PlasmaWallet.getUTXOKey(data);
+        this.utxos[key] = data;
+        newTx[key] = tx.getBytes().toString('hex');
+        console.log('insert', block.number, utxo.value);
+      });
     });
-    // non-inclusion proof
+    // getting proof
     Object.keys(this.utxos).forEach(key => {
-      Storage.store('proof.' + key + '.' + block.number, this.calProof(block, this.utxos[key]));
+      const proof = this.calProof(block, this.utxos[key]);
+      const dbKey = key + '.' + block.number;
+      if(newTx.hasOwnProperty(key)) {
+        // inclusion
+        this.bigStorage.add(
+          dbKey,
+          block.number,
+          proof,
+          newTx[key]
+        );
+      }else{
+        // non-inclusion
+        this.bigStorage.add(
+          dbKey,
+          block.number,
+          proof,
+          this.zeroHash
+        );
+      }
     });
     Storage.store('utxo', this.utxos);
   }

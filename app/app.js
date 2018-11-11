@@ -28,7 +28,8 @@ class App extends Component {
   }
 
   fetchBlock() {
-    this.props.fetchBlock();
+    this.props.fetchBlock(
+      this.state.blkNum || this.props.blockNumber);
   }
 
   updateUTXO() {
@@ -46,6 +47,12 @@ class App extends Component {
 
   deposit() {
     this.props.deposit();
+  }
+
+  onBlkNumChange(e) {
+    this.setState({
+      blkNum: e.target.value
+    });
   }
 
   onAddressChange(e) {
@@ -66,6 +73,10 @@ class App extends Component {
           <p>Block Number: {this.props.blockNumber}</p>
         </div>
         <div>
+          <span>blkNum</span>
+          <input
+            onChange={this.onBlkNumChange.bind(this)}
+          />
           <button onClick={this.fetchBlock.bind(this)}>fetchBlock</button>
           <p>Block</p>
           {this.props.block ? this.props.block.txs.map(tx => {

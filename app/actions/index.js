@@ -74,18 +74,20 @@ export function deposit() {
   };
 }
 
-export function fetchBlock() {
+export function fetchBlock(blkNum) {
+  if(typeof blkNum == 'string') {
+    blkNum = Number(blkNum);
+  }
   return (dispatch, getState) => {
-    childChainApi.getBlockNumber().then((blockNumber) => {
-      dispatch({
-        type: FETCH_BLOCK_NUMBER,
-        payload: blockNumber.result
+    return childChainApi.getBlockByNumber(blkNum).then((block) => {
+      const transactions = block.result.txs.map(tx => {
+        return Transaction.fromBytes(new Buffer(tx, 'hex'));
       });
-      return childChainApi.getBlockByNumber(blockNumber.result);
-    }).then((block) => {
       dispatch({
         type: FETCH_BLOCK,
-        payload: block.result
+        payload: {
+          txs: transactions
+        }
       });
     })
   };
