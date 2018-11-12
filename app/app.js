@@ -67,23 +67,28 @@ class App extends Component {
     }
     return (
       <div>
-        Plasma Sample Wallet!!
-        <div>
-          <button onClick={this.fetchBlockNumber.bind(this)}>fetchBlockNumber</button>
-          <p>Block Number: {this.props.blockNumber}</p>
+        <div className={Styles.container}>
+          Plasma Sample Wallet!!
+          <div>
+            <input className={Styles['form-address']} value={this.props.wallet.getAddress()} />
+          </div>
+          <div>
+            <button onClick={this.deposit.bind(this)}>Deposit 0.1ether</button>
+          </div>
         </div>
-        <div>
+        <div className={Styles.container}>
           <span>blkNum</span>
           <input
             onChange={this.onBlkNumChange.bind(this)}
           />
           <button onClick={this.fetchBlock.bind(this)}>fetchBlock</button>
+          <p>Block Number: {this.props.blockNumber}</p>
           <p>Block</p>
           {this.props.block ? this.props.block.txs.map(tx => {
             return (JSON.stringify(tx))
           }) : null}
         </div>
-        <div>
+        <div className={Styles.container}>
           <button onClick={this.updateUTXO.bind(this)}>updateUTXOs</button>
           <p>UTXO List</p>
           {this.props.utxos ? this.props.utxos.map(utxo => {
@@ -94,10 +99,7 @@ class App extends Component {
             return utxo.state.length == 0 || utxo.state[0] === 0;
           }).length * 0.1) : null}
         </div>
-        <div>
-          <button onClick={this.deposit.bind(this)}>Deposit 0.1ether</button>
-        </div>
-        <div>
+        <div className={Styles.container}>
           <div>
             <span>To Address: </span>
             <input 
