@@ -97,7 +97,7 @@ export function updateUTXO() {
   return (dispatch, getState) => {
     const wallet = getState().wallet;
     wallet.update().then(utxos => {
-      console.log(utxos);
+      console.log('utxos', utxos);
       dispatch({
         type: UPDATE_UTXO,
         payload: utxos

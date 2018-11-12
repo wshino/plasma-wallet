@@ -4,6 +4,7 @@ import {
   Transaction,
   TransactionOutput
 } from '@cryptoeconomicslab/plasma-chamber';
+import RLP from 'rlp';
 import ChildChainApi from '../helpers/childchain';
 import {
   BigStorage,
@@ -96,33 +97,24 @@ export default class PlasmaWallet {
     transactions.reduce((acc, tx) => {
       return acc.concat(tx.inputs);
     }, []).filter(filterOwner).forEach((spentUTXO) => {
-      const key = PlasmaWallet.getUTXOKey({
-        owners: spentUTXO.owners,
-        value: spentUTXO.value,
-        state: spentUTXO.state,
-        blkNum: spentUTXO.blkNum
-      });
+      const key = spentUTXO.hash();
       console.log('delete', spentUTXO.blkNum, block.number, spentUTXO.value);
       delete this.utxos[key];
     });
     let newTx = {};
     transactions.forEach(tx => {
       tx.outputs.filter(filterOwner).forEach(utxo => {
-        const data = {
-          owners: utxo.owners,
-          value: utxo.value,
-          state: utxo.state,
-          blkNum: block.number
-        };
-        const key = PlasmaWallet.getUTXOKey(data);
-        this.utxos[key] = data;
+        // TODO: fix
+        utxo.blkNum = block.number;
+        const key = utxo.hash(block.number);
+        this.utxos[key] = utxo.getBytes(block.number).toString('hex');
         newTx[key] = tx.getBytes().toString('hex');
         console.log('insert', block.number, utxo.value);
       });
     });
     // getting proof
     Object.keys(this.utxos).forEach(key => {
-      const proof = this.calProof(block, this.utxos[key]);
+      const proof = this.calProof(block, TransactionOutput.fromTuple(RLP.decode(Buffer.from(this.utxos[key], 'hex'))));
       if(newTx.hasOwnProperty(key)) {
         // inclusion
         this.bigStorage.add(
@@ -186,7 +178,7 @@ export default class PlasmaWallet {
 
   getUTXOArray() {
     return Object.keys(this.utxos).map(k => {
-      return this.utxos[k];
+      return TransactionOutput.fromTuple(RLP.decode(Buffer.from(this.utxos[k], 'hex')));
     });
   }
 }
