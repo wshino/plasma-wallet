@@ -110,7 +110,6 @@ export function updateUTXO() {
 export function transfer(utxo, toAddress) {
   toAddress = new Buffer(toAddress, 'hex');
   return (dispatch, getState) => {
-    console.log(utxo)
     const wallet = getState().wallet;
     const input = new TransactionOutput(
       utxo.owners,
@@ -118,7 +117,9 @@ export function transfer(utxo, toAddress) {
       utxo.state,
       utxo.blkNum
     );
-    console.log(input, toAddress);
+    wallet.getHistory(PlasmaWallet.getUTXOKey(input)).then(history => {
+      console.log('we should send history to receiver.', history);
+    });
     const output = new TransactionOutput(
       [toAddress],
       utxo.value.map(s=>parseInt(s)),

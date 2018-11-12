@@ -1,3 +1,5 @@
+import { resolve } from "path";
+
 export class Storage {
 
   static store(key, item) {
@@ -28,20 +30,41 @@ export class BigStorage {
     request.onupgradeneeded = (event) => {
       console.log('onupgradeneeded');
       const db = event.target.result;
-      const proofStore = db.createObjectStore('proof', { keyPath: 'utxoKey' });
-      proofStore.createIndex('blkNum', 'blkNum', { unique: false });
+      const proofStore = db.createObjectStore('proof', { keyPath: 'id' });
+      proofStore.createIndex('utxoKey', 'utxoKey', { unique: false });
     }
   }
 
-  add(key, blkNum, proof, txBytes) {
+  add(utxoKey, blkNum, proof, txBytes) {
     const storeName = 'proof'
     this.db.transaction(storeName, 'readwrite')
         .objectStore(storeName)
         .add({
-      utxoKey: key,
+      id: utxoKey + '.' + blkNum,
+      utxoKey: utxoKey,
       blkNum: blkNum,
       proof: proof,
       txBytes: txBytes
+    });
+  }
+
+  searchProof(utxoKey) {
+    const storeName = 'proof'
+    const range = IDBKeyRange.only(utxoKey);
+    return new Promise((resolve, reject) => {
+      let proofs = [];
+      this.db.transaction(storeName, 'readonly')
+      .objectStore(storeName)
+      .index("utxoKey")
+      .openCursor(range).onsuccess = function(event) {
+        var cursor = event.target.result;
+        if (cursor) {
+          proofs.push(cursor.value);
+          cursor.continue();
+        }else{
+          resolve(proofs);
+        }
+      }
     });
   }
 

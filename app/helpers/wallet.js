@@ -119,11 +119,10 @@ export default class PlasmaWallet {
     // getting proof
     Object.keys(this.utxos).forEach(key => {
       const proof = this.calProof(block, this.utxos[key]);
-      const dbKey = key + '.' + block.number;
       if(newTx.hasOwnProperty(key)) {
         // inclusion
         this.bigStorage.add(
-          dbKey,
+          key,
           block.number,
           proof,
           newTx[key]
@@ -131,7 +130,7 @@ export default class PlasmaWallet {
       }else{
         // non-inclusion
         this.bigStorage.add(
-          dbKey,
+          key,
           block.number,
           proof,
           this.zeroHash
@@ -150,6 +149,10 @@ export default class PlasmaWallet {
       block.appendTx(tx);
     });
     return block.createTXOProof(utxo).toString('hex');
+  }
+
+  getHistory(utxoKey) {
+    return this.bigStorage.searchProof(utxoKey);
   }
 
   /**
