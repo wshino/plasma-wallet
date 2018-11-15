@@ -16,9 +16,9 @@
     esutils "^2.0.2"
     js-tokens "^4.0.0"
 
-"@cryptoeconomicslab/plasma-chamber@^0.0.8":
-  version "0.0.8"
-  resolved "https://registry.yarnpkg.com/@cryptoeconomicslab/plasma-chamber/-/plasma-chamber-0.0.8.tgz#8b9d6432699677cc96f4ccf2aa6b1bf59bf144ac"
+"@cryptoeconomicslab/plasma-chamber@^0.0.9":
+  version "0.0.9"
+  resolved "https://registry.yarnpkg.com/@cryptoeconomicslab/plasma-chamber/-/plasma-chamber-0.0.9.tgz#2d04183d38c74dcd42464cef4c5b2e602c593f8f"
   dependencies:
     bignumber.js "^8.0.1"
     istanbul-coveralls "^1.0.3"
