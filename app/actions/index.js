@@ -74,18 +74,20 @@ export function deposit() {
   };
 }
 
-export function fetchBlock() {
+export function fetchBlock(blkNum) {
+  if(typeof blkNum == 'string') {
+    blkNum = Number(blkNum);
+  }
   return (dispatch, getState) => {
-    childChainApi.getBlockNumber().then((blockNumber) => {
-      dispatch({
-        type: FETCH_BLOCK_NUMBER,
-        payload: blockNumber.result
+    return childChainApi.getBlockByNumber(blkNum).then((block) => {
+      const transactions = block.result.txs.map(tx => {
+        return Transaction.fromBytes(new Buffer(tx, 'hex'));
       });
-      return childChainApi.getBlockByNumber(blockNumber.result);
-    }).then((block) => {
       dispatch({
         type: FETCH_BLOCK,
-        payload: block.result
+        payload: {
+          txs: transactions
+        }
       });
     })
   };
@@ -95,7 +97,7 @@ export function updateUTXO() {
   return (dispatch, getState) => {
     const wallet = getState().wallet;
     wallet.update().then(utxos => {
-      console.log(utxos);
+      console.log('utxos', utxos);
       dispatch({
         type: UPDATE_UTXO,
         payload: utxos
@@ -108,7 +110,6 @@ export function updateUTXO() {
 export function transfer(utxo, toAddress) {
   toAddress = new Buffer(toAddress, 'hex');
   return (dispatch, getState) => {
-    console.log(utxo)
     const wallet = getState().wallet;
     const input = new TransactionOutput(
       utxo.owners,
@@ -116,7 +117,9 @@ export function transfer(utxo, toAddress) {
       utxo.state,
       utxo.blkNum
     );
-    console.log(input, toAddress);
+    wallet.getHistory(PlasmaWallet.getUTXOKey(input)).then(history => {
+      console.log('we should send history to receiver.', history);
+    });
     const output = new TransactionOutput(
       [toAddress],
       utxo.value.map(s=>parseInt(s)),
