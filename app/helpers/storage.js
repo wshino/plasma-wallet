@@ -35,7 +35,7 @@ export class BigStorage {
     }
   }
 
-  add(utxoKey, blkNum, proof, txBytes) {
+  add(utxoKey, blkNum, proof, txBytes, index) {
     const storeName = 'proof'
     this.db.transaction(storeName, 'readwrite')
         .objectStore(storeName)
@@ -44,7 +44,43 @@ export class BigStorage {
       utxoKey: utxoKey,
       blkNum: blkNum,
       proof: proof,
-      txBytes: txBytes
+      txBytes: txBytes,
+      index: index
+    });
+  }
+
+  get(utxoKey, blkNum) {
+    const storeName = 'proof'
+    const request = this.db.transaction(storeName, 'readwrite')
+        .objectStore(storeName)
+        .get(utxoKey + '.' + blkNum);
+    return new Promise((resolve, reject) => {
+      request.onerror = function(event) {
+        reject(event);
+      };
+      request.onsuccess = function(event) {
+        resolve(request.result);
+      };
+    });
+  }
+
+  lastTransactions(utxoKey) {
+    const storeName = 'proof'
+    const range = IDBKeyRange.upperBound(utxoKey, true);
+    return new Promise((resolve, reject) => {
+      let proofs = [];
+      this.db.transaction(storeName, 'readonly')
+      .objectStore(storeName)
+      .index("id")
+      .openCursor(range).onsuccess = function(event) {
+        var cursor = event.target.result;
+        if (cursor) {
+          proofs.push(cursor.value);
+          cursor.continue();
+        }else{
+          resolve(proofs);
+        }
+      }
     });
   }
 

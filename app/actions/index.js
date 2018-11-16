@@ -7,6 +7,7 @@ import utils from 'ethereumjs-util';
 
 import ChildChainApi from '../helpers/childchain';
 import PlasmaWallet from '../helpers/wallet';
+import RLP from 'rlp'
 
 const childChainApi = new ChildChainApi(process.env.CHILDCHAIN_ENDPOINT || 'http://localhost:3000');
 
@@ -67,6 +68,45 @@ export function deposit() {
       })
     }).then(function(error, result) {
       console.log("deposit: ", error, result);
+      dispatch({
+        type: DEPOSITED,
+        payload: {}
+      });
+    });
+  };
+}
+
+export function startExit(txList) {
+  return (dispatch, getState) => {
+    const web3 = getState().wallet.web3;
+    var rootChainContract = new web3.eth.Contract(
+      RootChainArtifacts.abi,
+      RootChainAddress
+    );
+    web3.eth.getAccounts().then((accounts) => {
+
+      const txListBytes = RLP.encode(txList);
+      const latestTx = txList[txList.length - 1];
+      console.log(
+        latestTx[0],
+        latestTx[4],
+        txList
+      )
+      console.log(utils.bufferToHex(txListBytes))
+
+      return rootChainContract.methods.startExit(
+        OperatorAddress,
+        latestTx[0],
+        latestTx[4],
+        utils.bufferToHex(txListBytes)
+      ).send({
+        from: accounts[0],
+        gas: 1000000,
+        // Exit Bond
+        // value: new BN("1000000000000000000")
+      })
+    }).then(function(error, result) {
+      console.log("startExit: ", error, result);
       dispatch({
         type: DEPOSITED,
         payload: {}

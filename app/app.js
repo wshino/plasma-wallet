@@ -6,6 +6,7 @@ import {
   fetchBlock,
   updateUTXO,
   deposit,
+  startExit,
   transfer
 } from './actions';
 import Styles from './style.css';
@@ -13,7 +14,9 @@ import Styles from './style.css';
 class App extends Component {
   constructor(props) {
     super(props)
-    this.state = {}
+    this.state = {
+      amount: 20000000000000000
+    }
   }
 
   componentWillMount() {
@@ -42,12 +45,19 @@ class App extends Component {
       this.props.transfer(
         utxo,
         this.state.toAddress,
-        20000000000000000);
+        this.state.amount);
     }
   }
 
   deposit() {
     this.props.deposit();
+  }
+
+  startExit(utxo) {
+    console.log('startExit', utxo);
+    this.props.wallet.getTransactions(utxo, 2).then(txList => {
+      return this.props.startExit(txList);
+    });
   }
 
   onBlkNumChange(e) {
@@ -58,6 +68,10 @@ class App extends Component {
 
   onAddressChange(e) {
     this.setState({toAddress: e.target.value})
+  }
+
+  onAmountChange(e) {
+    this.setState({amount: e.target.value})
   }
 
   render() {
@@ -93,7 +107,9 @@ class App extends Component {
           <button onClick={this.updateUTXO.bind(this)}>updateUTXOs</button>
           <p>UTXO List</p>
           {this.props.utxos ? this.props.utxos.map(utxo => {
-            return (JSON.stringify(utxo.value))
+            return (<div>
+              {JSON.stringify(utxo.value)}
+              <button onClick={this.startExit.bind(this, utxo)}>startExit</button></div>)
           }) : null}
           <p>balance</p>
           {this.props.utxos ? (this.props.utxos.filter(utxo => {
@@ -109,6 +125,13 @@ class App extends Component {
               className={Styles['form-input-address']}
               onChange={this.onAddressChange.bind(this)}
             />
+            <input
+              placeholder="amount"
+              type="number"
+              value={this.state.amount}
+              className={Styles['form-input-address']}
+              onChange={this.onAmountChange.bind(this)}
+            />
           </div>
           <button onClick={this.transfer.bind(this)}>transfer</button>
         </div>
@@ -123,6 +146,7 @@ const mapDispatchToProps = {
   fetchBlock,
   updateUTXO,
   deposit,
+  startExit,
   transfer
 };
 
