@@ -158,6 +158,9 @@ export function transfer(utxo, toAddress, amount) {
       utxo.state,
       utxo.blkNum
     );
+    if(utxo.value[0].end - utxo.value[0].start <= amount) {
+      throw new Error('amount is too big');
+    }
     wallet.getHistory(PlasmaWallet.getUTXOKey(input)).then(history => {
       console.log('we should send history to receiver.', history);
     });
