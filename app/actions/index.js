@@ -27,16 +27,16 @@ const RootChainAddress = process.env.ROOTCHAIN_ADDRESS || '0x345ca3e014aaf5dca48
 const OperatorAddress = process.env.OPERATOR_ADDRESS || '0x627306090abab3a6e1400e9345bc60c78a8bef57';
 
 export function web3connect() {
-  return (dispatch) => {
+  return async (dispatch) => {
     const wallet = new PlasmaWallet();
-    wallet.initWeb3().then(() => {
-      dispatch({
-        type: WEB3_CONNECTED,
-        payload: {
-          wallet: wallet
-        }
-      });
+    await wallet.initWeb3();
+    dispatch({
+      type: WEB3_CONNECTED,
+      payload: {
+        wallet: wallet
+      }
     });
+    return wallet;
   };
 }
 

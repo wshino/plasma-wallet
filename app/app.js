@@ -21,8 +21,9 @@ class App extends Component {
 
   componentWillMount() {
     // initialize web3
-    window.addEventListener('load', () => {
-      this.props.web3connect();
+    window.addEventListener('load', async () => {
+      const wallet = await this.props.web3connect();
+      this.props.updateUTXO();
     });
   }
 
@@ -106,8 +107,8 @@ class App extends Component {
         <div className={Styles.container}>
           <button onClick={this.updateUTXO.bind(this)}>updateUTXOs</button>
           <p>UTXO List</p>
-          {this.props.utxos ? this.props.utxos.map(utxo => {
-            return (<div>
+          {this.props.utxos ? this.props.utxos.map((utxo, i) => {
+            return (<div key={i}>
               {JSON.stringify(utxo.value)}
               <button onClick={this.startExit.bind(this, utxo)}>startExit</button></div>)
           }) : null}
