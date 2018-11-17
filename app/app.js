@@ -88,7 +88,7 @@ class App extends Component {
             <input className={Styles['form-address']} value={this.props.wallet.getAddress()} />
           </div>
           <div>
-            <button onClick={this.deposit.bind(this)}>Deposit 0.1ether</button>
+            <button onClick={this.deposit.bind(this)}>Deposit 1ether</button>
           </div>
         </div>
         <div className={Styles.container}>
