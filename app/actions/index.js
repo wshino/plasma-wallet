@@ -150,7 +150,7 @@ export function updateUTXO() {
 
 export function transfer(utxo, toAddress, amount) {
   toAddress = BufferUtils.hexToBuffer(toAddress);
-  return (dispatch, getState) => {
+  return async (dispatch, getState) => {
     const wallet = getState().wallet;
     const input = new TransactionOutput(
       utxo.owners,
@@ -191,18 +191,17 @@ export function transfer(utxo, toAddress, amount) {
       [input],
       [output1, output2]
     );
-    const sign = wallet.sign(tx);
+    const accounts = await wallet.web3.eth.getAccounts();
+    const sign = await wallet.sign(tx);
     tx.sigs.push(sign);
     // include sigunatures
     let txBytes = tx.getBytes(true);
-
     const data = txBytes.toString('hex');
-    return childChainApi.sendRawTransaction(data).then(transactionHash => {
-      console.log("sendRawTransaction: ", transactionHash);
-      dispatch({
-        type: SEND_RAW_TRANSACTION,
-        payload: transactionHash
-      });
+    const transactionHash = await childChainApi.sendRawTransaction(data);
+    console.log("sendRawTransaction: ", transactionHash);
+    dispatch({
+      type: SEND_RAW_TRANSACTION,
+      payload: transactionHash
     });
   };
 }

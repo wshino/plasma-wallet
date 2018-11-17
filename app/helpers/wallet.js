@@ -15,6 +15,9 @@ import BigNumber from 'bignumber.js';
 
 const CHUNK_SIZE = BigNumber('1000000000000000000');
 
+const WALLET_MODE_UNKNOWM = 0;
+const WALLET_MODE_METAMASK = 1;
+const WALLET_MODE_MOBILE = 2;
 
 /**
  * Plasma wallet store UTXO and proof
@@ -32,6 +35,7 @@ export default class PlasmaWallet {
     // address is hex string and checksum address
     this.address = null;
     this.zeroHash = utils.sha3(0).toString('hex');
+    this.mode = WALLET_MODE_UNKNOWM;
   }
 
   getAddress() {
@@ -44,6 +48,7 @@ export default class PlasmaWallet {
     this.privKey = new Buffer(privateKeyHex, 'hex');
     if (typeof web3 !== 'undefined') {
       // MetaMask
+      this.mode = WALLET_MODE_METAMASK;
       const web3tmp = new Web3(web3.currentProvider);
       this.web3 = web3tmp;
       this.web3Child = web3tmp;
@@ -53,6 +58,7 @@ export default class PlasmaWallet {
       });
     }else{
       // Mobile
+      this.mode = WALLET_MODE_MOBILE;
       const web3 = new Web3(new Web3.providers.HttpProvider(
         process.env.CHILDCHAIN_ENDPOINT || 'http://localhost:3000'
       ));
@@ -239,8 +245,13 @@ export default class PlasmaWallet {
    * @dev sign transaction by private key
    * @param {Transaction} tx
    */
-  sign(tx) {
-    return tx.sign(this.privKey);
+  async sign(tx) {
+    if(this.mode == WALLET_MODE_METAMASK) {
+      const accounts = await this.web3.eth.getAccounts();
+      return await this.web3.eth.sign(utils.bufferToHex(tx.hash()), accounts[0]);
+    }else{
+      return tx.sign(this.privKey);
+    }
   }
 
   /**
