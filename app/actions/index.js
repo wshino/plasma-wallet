@@ -149,7 +149,7 @@ export function updateUTXO() {
 
 
 export function transfer(utxo, toAddress, amount) {
-  toAddress = new Buffer(toAddress, 'hex');
+  toAddress = BufferUtils.hexToBuffer(toAddress);
   return (dispatch, getState) => {
     const wallet = getState().wallet;
     const input = new TransactionOutput(
