@@ -10,6 +10,7 @@ import {
   transfer
 } from './actions';
 import Styles from './style.css';
+import BigNumber from 'bignumber.js';
 
 class App extends Component {
   constructor(props) {
@@ -50,8 +51,8 @@ class App extends Component {
     }
   }
 
-  deposit() {
-    this.props.deposit();
+  deposit(eth) {
+    this.props.deposit(eth);
   }
 
   startExit(utxo) {
@@ -89,7 +90,9 @@ class App extends Component {
             <input className={Styles['form-address']} value={this.props.wallet.getAddress()} />
           </div>
           <div>
-            <button onClick={this.deposit.bind(this)}>Deposit 1ether</button>
+            <button onClick={this.deposit.bind(this, 1)}>Deposit 1 ether</button>
+            <button onClick={this.deposit.bind(this, 2)}>Deposit 2 ether</button>
+            <button onClick={this.deposit.bind(this, 10)}>Deposit 10 ether</button>
           </div>
         </div>
         <div className={Styles.container}>
@@ -116,8 +119,8 @@ class App extends Component {
           {this.props.utxos ? (this.props.utxos.filter(utxo => {
             return utxo.state.length == 0 || utxo.state[0] === 0;
           }).reduce((acc, utxo) => {
-            return acc + (utxo.value[0].end.div(1000000000000000000).minus(utxo.value[0].start.div(1000000000000000000))).toNumber();
-          }, 0)) : null}
+            return acc.plus(utxo.value[0].end.div(1000000000000000000).minus(utxo.value[0].start.div(1000000000000000000)));
+          }, BigNumber(0))).toString() : null}
         </div>
         <div className={Styles.container}>
           <div>

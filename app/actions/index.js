@@ -51,7 +51,7 @@ export function fetchBlockNumber() {
   };
 }
 
-export function deposit() {
+export function deposit(eth) {
   return (dispatch, getState) => {
     const web3 = getState().wallet.web3;
     var rootChainContract = new web3.eth.Contract(
@@ -64,7 +64,7 @@ export function deposit() {
       ).send({
         from: accounts[0],
         gas: 200000,
-        value: new BN("1000000000000000000")
+        value: (new BN("1000000000000000000")).mul(new BN(eth))
       })
     }).then(function(error, result) {
       console.log("deposit: ", error, result);
