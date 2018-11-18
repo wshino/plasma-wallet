@@ -43,13 +43,14 @@ class App extends Component {
   
   transfer() {
     const utxos = this.props.utxos;
+    const amount = Number(this.state.amount);
     const amounts = utxos.map((utxo, i) => {
       return utxo.value[0].end - utxo.value[0].start;
     });
     let maxIndex = 0;
     let maxAmount = 0;
     amounts.forEach((a, i) => {
-      if(maxAmount < a) {
+      if(maxAmount < a && a > amount) {
         maxAmount = a;
         maxIndex = i;
       }
@@ -59,7 +60,7 @@ class App extends Component {
       this.props.transfer(
         utxo,
         this.state.toAddress,
-        this.state.amount);
+        amount);
     }
   }
 
