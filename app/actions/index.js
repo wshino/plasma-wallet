@@ -1,4 +1,5 @@
 import {
+  BufferUtils,
   Transaction,
   TransactionOutput
 } from '@cryptoeconomicslab/plasma-chamber';
@@ -62,7 +63,7 @@ export function deposit() {
       ).send({
         from: accounts[0],
         gas: 200000,
-        value: new BN("100000000000000000")
+        value: new BN("1000000000000000000")
       })
     }).then(function(error, result) {
       console.log("deposit: ", error, result);
@@ -107,30 +108,45 @@ export function updateUTXO() {
 }
 
 
-export function transfer(utxo, toAddress) {
+export function transfer(utxo, toAddress, amount) {
   toAddress = new Buffer(toAddress, 'hex');
   return (dispatch, getState) => {
     const wallet = getState().wallet;
     const input = new TransactionOutput(
       utxo.owners,
-      utxo.value.map(s=>parseInt(s)),
+      utxo.value,
       utxo.state,
       utxo.blkNum
     );
     wallet.getHistory(PlasmaWallet.getUTXOKey(input)).then(history => {
       console.log('we should send history to receiver.', history);
     });
-    const output = new TransactionOutput(
+    const output1 = new TransactionOutput(
       [toAddress],
-      utxo.value.map(s=>parseInt(s)),
+      utxo.value.map(({start, end}) => {
+        return {
+          start: start,
+          end: start.plus(amount)
+        }
+      }),
+      [0]
+    );
+    const output2 = new TransactionOutput(
+      utxo.owners,
+      utxo.value.map(({start, end}) => {
+        return {
+          start: start.plus(amount),
+          end: end
+        }
+      }),
       [0]
     );
     const tx = new Transaction(
-      0,
-      [toAddress],
+      1,
+      [toAddress, BufferUtils.numToBuffer(amount)],
       new Date().getTime(),
       [input],
-      [output]
+      [output1, output2]
     );
     const sign = wallet.sign(tx);
     tx.sigs.push(sign);

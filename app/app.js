@@ -9,7 +9,7 @@ import {
   transfer
 } from './actions';
 import Styles from './style.css';
-console.log(Styles)
+
 class App extends Component {
   constructor(props) {
     super(props)
@@ -41,7 +41,8 @@ class App extends Component {
     if(utxo) {
       this.props.transfer(
         utxo,
-        this.state.toAddress);
+        this.state.toAddress,
+        20000000000000000);
     }
   }
 
@@ -97,7 +98,9 @@ class App extends Component {
           <p>balance</p>
           {this.props.utxos ? (this.props.utxos.filter(utxo => {
             return utxo.state.length == 0 || utxo.state[0] === 0;
-          }).length * 0.1) : null}
+          }).reduce((acc, utxo) => {
+            return acc + (utxo.value[0].end.div(1000000000000000000).minus(utxo.value[0].start.div(1000000000000000000))).toNumber();
+          }, 0)) : null}
         </div>
         <div className={Styles.container}>
           <div>
