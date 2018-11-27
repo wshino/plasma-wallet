@@ -574,8 +574,9 @@
     lodash "^4.17.10"
     to-fast-properties "^2.0.0"
 
-"@cryptoeconomicslab/chamber-core@../ethstacks/packages/chamber-core":
-  version "1.0.0"
+"@cryptoeconomicslab/chamber-core@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@cryptoeconomicslab/chamber-core/-/chamber-core-1.0.1.tgz#f1e6674042e63479d020a97222dc79c67f2c6b2f"
   dependencies:
     bignumber.js "^8.0.1"
     ethereumjs-util "^5.2.0"
