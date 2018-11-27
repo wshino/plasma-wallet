@@ -89,17 +89,15 @@ export default class PlasmaWallet extends BaseWallet {
       }
       return Promise.all(tasks);
     }).then((responses) => {
-      responses.map(this.updateBlock.bind(this));
+      responses.map(res => {
+        const block = res.result
+        this.updateBlock(Block.fromString(JSON.stringify(block)))
+      });
       this.updateLoadedBlockNumber(this.latestBlockNumber);
-      return this.getUTXOArray();
+      return this.getUTXOs();
     });
   }
-
-  updateBlockString(res) {
-    const block = res.result;
-    this.updateBlock(Block.fromString(JSON.stringify(block)))
-  }
-
+  
   getHistory(utxoKey) {
     return this.bigStorage.searchProof(utxoKey);
   }
