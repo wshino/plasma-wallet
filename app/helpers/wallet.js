@@ -1,10 +1,10 @@
 import Web3 from 'web3';
 import {
+  BaseWallet,
   Block,
   Transaction,
   TransactionOutput
-} from '@cryptoeconomicslab/plasma-chamber';
-import RLP from 'rlp';
+} from '@cryptoeconomicslab/chamber-core';
 import ChildChainApi from '../helpers/childchain';
 import {
   BigStorage,
@@ -22,18 +22,20 @@ const WALLET_MODE_MOBILE = 2;
 /**
  * Plasma wallet store UTXO and proof
  */
-export default class PlasmaWallet {
+export default class PlasmaWallet extends BaseWallet {
+
   constructor() {
+    super({
+      storage: Storage,
+      bigStorage: new BigStorage()
+    });
     this.childChainApi = new ChildChainApi(process.env.CHILDCHAIN_ENDPOINT || 'http://localhost:3000');
     // what we have
     this.utxos = Storage.load('utxo') || {};
-    this.bigStorage = new BigStorage();
     this.latestBlockNumber = 0;
     this.loadedBlockNumber = Storage.load('loadedBlockNumber') || 0;
     // privKey is Buffer
     this.privKey = null;
-    // address is hex string and checksum address
-    this.address = null;
     this.zeroHash = utils.sha3(0).toString('hex');
     this.mode = WALLET_MODE_UNKNOWM;
   }
@@ -53,7 +55,7 @@ export default class PlasmaWallet {
       this.web3 = web3tmp;
       this.web3Child = web3tmp;
       return this.web3.eth.getAccounts().then(accounts => {
-        this.address = accounts[0];
+        this.setAddress(accounts[0])
         return Promise.resolve();
       });
     }else{
@@ -70,7 +72,7 @@ export default class PlasmaWallet {
       web3Root.eth.accounts.wallet.add(utils.bufferToHex(this.privKey));
       this.web3 = web3Root;
       this.web3Child = web3;
-      this.address = utils.toChecksumAddress(utils.bufferToHex(address));
+      this.setAddress(utils.toChecksumAddress(utils.bufferToHex(address)))
       return Promise.resolve();
     }
   }
@@ -93,104 +95,9 @@ export default class PlasmaWallet {
     });
   }
 
-  updateBlock(res) {
+  updateBlockString(res) {
     const block = res.result;
-    const transactions = block.txs.map(tx => {
-      return Transaction.fromBytes(new Buffer(tx, 'hex'));
-    });
-    const filterOwner = (o) => {
-      const r = o.owners.map(ownerAddress => {
-        return utils.toChecksumAddress(ownerAddress);
-      });
-      return r.indexOf(this.address) >= 0;
-    };
-    transactions.reduce((acc, tx) => {
-      return acc.concat(tx.inputs);
-    }, []).filter(filterOwner).forEach((spentUTXO) => {
-      const key = spentUTXO.hash().toString('hex');
-      console.log('delete', spentUTXO.blkNum, block.number, spentUTXO.value);
-      delete this.utxos[key];
-    });
-    let newTx = {};
-    transactions.forEach(tx => {
-      tx.outputs.forEach((utxo, i) => {
-        if(filterOwner(utxo)) {
-          const key = utxo.hash(block.number).toString('hex');
-          this.utxos[key] = utxo.getBytes(block.number).toString('hex');
-          newTx[key] = {
-            txBytes: tx.getBytes(true).toString('hex'),
-            index: i
-          };
-          console.log('insert', block.number, utxo.value, i);
-        }
-      });
-    });
-    let chunks = [];
-    transactions.forEach(tx => {
-      tx.outputs.forEach((utxo, oIndex) => {
-        utxo.value.forEach(({start, end}, i) => {
-          const slot = start.div(CHUNK_SIZE).integerValue(BigNumber.ROUND_FLOOR).toNumber();
-          chunks[slot] = {
-            txBytes: tx.getBytes(true).toString('hex'),
-            index: oIndex,
-            output: utxo
-          }
-        });
-      });
-    });
-    // getting proof
-    Object.keys(this.utxos).forEach(key => {
-      TransactionOutput.fromBytes(Buffer.from(this.utxos[key], 'hex')).value.map(({start, end}) => {
-        const slot = start.div(CHUNK_SIZE).integerValue(BigNumber.ROUND_FLOOR).toNumber();
-        const proof = this.calProof(
-          block,
-          transactions,
-          slot);
-        
-        if(newTx.hasOwnProperty(key)) {
-          console.log('update 1', block.number)
-          // inclusion
-          this.bigStorage.add(
-            slot,
-            block.number,
-            proof,
-            newTx[key].txBytes,
-            newTx[key].index
-          );
-        }else{
-          console.log('update 2', block.number)
-          // non-inclusion
-          if(chunks[slot]) {
-            this.bigStorage.add(
-              slot,
-              block.number,
-              proof,
-              chunks[slot].txBytes,
-              chunks[slot].index
-            );
-          }else{
-            console.log('update 3', block.number)
-            this.bigStorage.add(
-              slot,
-              block.number,
-              proof,
-              this.zeroHash
-            );
-          }
-        }
-      });
-    });
-    Storage.store('utxo', this.utxos);
-  }
-
-  calProof(blockJson, transactions, chunk) {
-    const block = new Block(blockJson.number);
-    transactions.forEach(tx => {
-      block.appendTx(tx);
-    });
-    console.log(block.number, block.txs[0].getBytes(true).toString('hex'))
-    console.log('merkleHash', blockJson.number, block.merkleHash().toString('hex'));
-    return block.createCoinProof(chunk).toString('hex');
+    this.updateBlock(Block.fromString(JSON.stringify(block)))
   }
 
   getHistory(utxoKey) {
@@ -271,9 +178,4 @@ export default class PlasmaWallet {
     Storage.store('loadedBlockNumber', this.loadedBlockNumber);
   }
 
-  getUTXOArray() {
-    return Object.keys(this.utxos).map(k => {
-      return TransactionOutput.fromTuple(RLP.decode(Buffer.from(this.utxos[k], 'hex')));
-    });
-  }
 }
