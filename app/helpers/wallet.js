@@ -97,55 +97,11 @@ export default class PlasmaWallet extends BaseWallet {
       return this.getUTXOs();
     });
   }
-  
+
   getHistory(utxoKey) {
     return this.bigStorage.searchProof(utxoKey);
   }
-
-  async getTransactions(utxo, num) {
-    const slots = utxo.value.map(({start, end}) => {
-      const slot = start.div(CHUNK_SIZE).integerValue(BigNumber.ROUND_FLOOR).toNumber();
-      return slot;
-    });
-    // TODO: shoud fold history
-    const history = await this.bigStorage.get(slots[0], utxo.blkNum);
-    console.log(history);
-    const tx = Transaction.fromBytes(Buffer.from(history.txBytes, 'hex'));
-    const prevTxo = tx.inputs[0];
-    const prevSlots = prevTxo.value.map(({start, end}) => {
-      const slot = start.div(CHUNK_SIZE).integerValue(BigNumber.ROUND_FLOOR).toNumber();
-      return slot;
-    });
-    const prevHistory = await this.bigStorage.get(prevSlots[0], prevTxo.blkNum);
-    const prevTx = Transaction.fromBytes(Buffer.from(prevHistory.txBytes, 'hex'));
-    let prevIndex = 0;
-    prevTx.outputs.map((o, i) => {
-      if(Buffer.compare(o.hash(prevTxo.blkNum), prevTxo.hash()) == 0) {
-        prevIndex = i;
-      }
-    });
-    let index = 0;
-    tx.outputs.map((o, i) => {
-      if(Buffer.compare(o.hash(utxo.blkNum), utxo.hash()) == 0) {
-        index = i;
-      }
-    });    
-    console.log(prevTx, tx);
-    return [[
-      prevHistory.blkNum,
-      prevTx.getBytes(),
-      Buffer.from(prevHistory.proof, 'hex'),
-      prevTx.sigs[0],
-      prevIndex
-    ], [
-      history.blkNum,
-      tx.getBytes(),
-      Buffer.from(history.proof, 'hex'),
-      tx.sigs[0],
-      index
-    ]]
-  }
-
+  
   /**
    * @dev sign transaction by private key
    * @param {Transaction} tx
