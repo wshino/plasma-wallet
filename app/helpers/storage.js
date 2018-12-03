@@ -36,7 +36,7 @@ export class BigStorage {
   }
 
   add(utxoKey, blkNum, proof, txBytes, index) {
-    const storeName = 'proof'
+    const storeName = 'proof';
     this.db.transaction(storeName, 'readwrite')
         .objectStore(storeName)
         .add({

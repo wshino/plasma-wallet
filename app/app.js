@@ -1,5 +1,5 @@
-import React, { Component } from 'react'
-import { connect } from 'react-redux'
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import {
   web3connect,
   fetchBlockNumber,
@@ -14,13 +14,13 @@ import BigNumber from 'bignumber.js';
 
 class App extends Component {
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
       amount: 20000000000000000
-    }
+    };
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     // initialize web3
     window.addEventListener('load', async () => {
       const wallet = await this.props.web3connect();

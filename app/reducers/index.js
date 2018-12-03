@@ -28,3 +28,32 @@ const reducer = (state = defaultState, action) => {
 };
 
 export default reducer;
+
+
+// const handlers = {
+//   transactionReducer:{
+//     [WEB3_CONNECTED]: (state, action) => {
+//       return ( ...state, { wallet: action.payload.wallet }}
+//     },
+//     [FETCH_BLOCK_NUMBER]: (state) => {
+//       return { ...state, {blockNumber: action.payload}}
+//     },
+//     [FETCH_BLOCK]: (state) => {
+//       return { ...state, {block: action.payload}}
+//     },
+//     [UPDATE_UTXO]: (state) => {
+//       return { ...state, {utxos: action.payload}}
+//     },
+//     [SEND_RAW_TRANSACTION]: (state) => {
+//       return { ...state, {txResult: action.payload}};
+//     }
+//   }
+// }  
+
+// reducer = (state = defaultState, action) => {
+//   const handler = handlers.transactionReducer[action.type]
+//   if (!handler) { return state }
+//   return handler(state, action)
+// }
+
+// export default reducer;
