@@ -24,7 +24,7 @@ class App extends Component {
     // initialize web3
     window.addEventListener('load', async () => {
       const wallet = await this.props.web3connect();
-      this.props.updateUTXO();
+      await this.props.updateUTXO();
     });
   }
 
@@ -82,11 +82,11 @@ class App extends Component {
   }
 
   onAddressChange(e) {
-    this.setState({toAddress: e.target.value})
+    this.setState({toAddress: e.target.value});
   }
 
   onAmountChange(e) {
-    this.setState({amount: e.target.value})
+    this.setState({amount: e.target.value});
   }
 
   render() {
@@ -95,12 +95,13 @@ class App extends Component {
         <div> Loading wallet </div>
       );
     }
+    
     return (
       <div>
         <div className={Styles.container}>
           Plasma Sample Wallet!!
           <div>
-            <input className={Styles['form-address']} value={this.props.wallet.getAddress()} />
+            <p className={Styles['form-address']} >{this.props.wallet.getAddress()}</p>
           </div>
           <div>
             <button onClick={this.deposit.bind(this, 1)}>Deposit 1 ether</button>
@@ -116,24 +117,37 @@ class App extends Component {
           <button onClick={this.fetchBlock.bind(this)}>fetchBlock</button>
           <p>Block Number: {this.props.blockNumber}</p>
           <p>Block</p>
-          {this.props.block ? this.props.block.txs.map(tx => {
-            return (JSON.stringify(tx))
-          }) : null}
+          {
+            this.props.block 
+              ? this.props.block.txs.map(tx => { return (JSON.stringify(tx)); }) 
+              : null
+          }
         </div>
         <div className={Styles.container}>
           <button onClick={this.updateUTXO.bind(this)}>updateUTXOs</button>
           <p>UTXO List</p>
-          {this.props.utxos ? this.props.utxos.map((utxo, i) => {
-            return (<div key={i}>
-              {JSON.stringify(utxo.value)}
-              <button onClick={this.startExit.bind(this, utxo)}>startExit</button></div>)
-          }) : null}
+          {
+            this.props.utxos 
+              ? this.props.utxos.map((utxo, i) => {
+                return (
+                  <div key={i}>
+                    {JSON.stringify(utxo.value)}
+                    <button onClick={this.startExit.bind(this, utxo)}>startExit</button>
+                  </div>
+                );
+              }) 
+              : null
+          }
           <p>balance</p>
-          {this.props.utxos ? (this.props.utxos.filter(utxo => {
-            return utxo.state.length == 0 || utxo.state[0] === 0;
-          }).reduce((acc, utxo) => {
-            return acc.plus(utxo.value[0].end.div(1000000000000000000).minus(utxo.value[0].start.div(1000000000000000000)));
-          }, BigNumber(0))).toString() : null}
+          {
+            this.props.utxos 
+              ? (this.props.utxos.filter(utxo => {
+                return utxo.state.length == 0 || utxo.state[0] === 0;
+              }).reduce((acc, utxo) => {
+                return acc.plus(utxo.value[0].end.div(1000000000000000000).minus(utxo.value[0].start.div(1000000000000000000)));
+              }, BigNumber(0))).toString() 
+              : null
+          }
         </div>
         <div className={Styles.container}>
           <div>

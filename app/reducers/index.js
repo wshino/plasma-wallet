@@ -8,52 +8,30 @@ import {
 
 const defaultState = {};
 
-const reducer = (state = defaultState, action) => {
-  switch (action.type) {
-  case WEB3_CONNECTED:
-    return Object.assign({}, state, {
-      wallet: action.payload.wallet
-    });
-  case FETCH_BLOCK_NUMBER:
-    return Object.assign({}, state, {blockNumber: action.payload});
-  case FETCH_BLOCK:
-    return Object.assign({}, state, {block: action.payload});
-  case UPDATE_UTXO:
-    return Object.assign({}, state, {utxos: action.payload});
-  case SEND_RAW_TRANSACTION:
-    return Object.assign({}, state, {txResult: action.payload});
-  default:
-    return state;
+export const handlers = {
+  transactionReducer:{
+    [WEB3_CONNECTED]: (state, action) => {
+      return { ...state, wallet: action.payload.wallet }
+    },
+    [FETCH_BLOCK_NUMBER]: (state, action) => {
+      return { ...state, blockNumber: action.payload }
+    },
+    [FETCH_BLOCK]: (state, action) => {
+      return { ...state, block: action.payload }
+    },
+    [UPDATE_UTXO]: (state, action) => {
+      return { ...state, utxos: action.payload }
+    },
+    [SEND_RAW_TRANSACTION]: (state, action) => {
+      return { ...state, txResult: action.payload };
+    }
   }
-};
+}  
+
+function reducer (state = defaultState, action) {
+  const handler = handlers.transactionReducer[action.type]
+  if (!handler) { return state }
+  return handler(state, action)
+}
 
 export default reducer;
-
-
-// const handlers = {
-//   transactionReducer:{
-//     [WEB3_CONNECTED]: (state, action) => {
-//       return ( ...state, { wallet: action.payload.wallet }}
-//     },
-//     [FETCH_BLOCK_NUMBER]: (state) => {
-//       return { ...state, {blockNumber: action.payload}}
-//     },
-//     [FETCH_BLOCK]: (state) => {
-//       return { ...state, {block: action.payload}}
-//     },
-//     [UPDATE_UTXO]: (state) => {
-//       return { ...state, {utxos: action.payload}}
-//     },
-//     [SEND_RAW_TRANSACTION]: (state) => {
-//       return { ...state, {txResult: action.payload}};
-//     }
-//   }
-// }  
-
-// reducer = (state = defaultState, action) => {
-//   const handler = handlers.transactionReducer[action.type]
-//   if (!handler) { return state }
-//   return handler(state, action)
-// }
-
-// export default reducer;

@@ -7,12 +7,11 @@ import utils from 'ethereumjs-util';
 
 import ChildChainApi from '../helpers/childchain';
 import PlasmaWallet from '../helpers/wallet';
-import RLP from 'rlp'
+import RLP from 'rlp';
 
 const childChainApi = new ChildChainApi(process.env.CHILDCHAIN_ENDPOINT || 'http://localhost:3000');
 
-const BN = utils.BN
-
+const BN = utils.BN;
 
 export const WEB3_CONNECTED = 'WEB3_CONNECTED';
 export const FETCH_BLOCK_NUMBER = 'FETCH_BLOCK_NUMBER';
@@ -47,7 +46,7 @@ export function fetchBlockNumber() {
         type: FETCH_BLOCK_NUMBER,
         payload: blockNumber.result
       });
-    })
+    });
   };
 }
 
@@ -65,7 +64,7 @@ export function deposit(eth) {
         from: accounts[0],
         gas: 200000,
         value: (new BN("1000000000000000000")).mul(new BN(eth))
-      })
+      });
     }).then(function(error, result) {
       console.log("deposit: ", error, result);
       dispatch({
@@ -130,7 +129,7 @@ export function fetchBlock(blkNum) {
           txs: transactions
         }
       });
-    })
+    });
   };
 }
 
@@ -143,7 +142,7 @@ export function updateUTXO() {
         type: UPDATE_UTXO,
         payload: utxos
       });
-    })
+    });
   };
 }
 
@@ -170,7 +169,7 @@ export function transfer(utxo, toAddress, amount) {
         return {
           start: start,
           end: start.plus(amount)
-        }
+        };
       }),
       [0]
     );
@@ -180,7 +179,7 @@ export function transfer(utxo, toAddress, amount) {
         return {
           start: start.plus(amount),
           end: end
-        }
+        };
       }),
       [0]
     );
