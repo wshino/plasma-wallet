@@ -20,7 +20,7 @@ class App extends Component {
     };
   }
 
-  UNSAFE_componentWillMount() {
+  componentDidMount() {
     // initialize web3
     window.addEventListener('load', async () => {
       const wallet = await this.props.web3connect();
