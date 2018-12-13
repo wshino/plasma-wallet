@@ -70,9 +70,7 @@ class App extends Component {
 
   startExit(utxo) {
     console.log('startExit', utxo);
-    this.props.wallet.getTransactions(utxo, 2).then(txList => {
-      return this.props.startExit(txList);
-    });
+    this.props.startExit(utxo);
   }
 
   onBlkNumChange(e) {
