@@ -1,19 +1,17 @@
 import Web3 from 'web3';
 import {
-  BaseWallet,
-  Block,
   Transaction,
   TransactionOutput
 } from '@cryptoeconomicslab/chamber-core';
+import {
+  BaseWallet
+} from '@cryptoeconomicslab/chamber-wallet';
 import ChildChainApi from '../helpers/childchain';
 import {
   BigStorage,
   Storage
 } from './storage';
 import utils from 'ethereumjs-util';
-import BigNumber from 'bignumber.js';
-
-const CHUNK_SIZE = BigNumber('1000000000000000000');
 
 const WALLET_MODE_UNKNOWM = 0;
 const WALLET_MODE_METAMASK = 1;
@@ -77,27 +75,6 @@ export default class PlasmaWallet extends BaseWallet {
     }
   }
 
-  /**
-   * @dev update UTXO and proof.
-   */
-  update() {
-    return this.childChainApi.getBlockNumber().then((blockNumber) => {
-      this.latestBlockNumber = blockNumber.result;
-      let tasks = [];
-      for(let i = this.loadedBlockNumber + 1;i <= this.latestBlockNumber;i++) {
-        tasks.push(this.childChainApi.getBlockByNumber(i));
-      }
-      return Promise.all(tasks);
-    }).then((responses) => {
-      responses.map(res => {
-        const block = res.result
-        this.updateBlock(Block.fromString(JSON.stringify(block)))
-      });
-      this.updateLoadedBlockNumber(this.latestBlockNumber);
-      return this.getUTXOs();
-    });
-  }
-
   getHistory(utxoKey) {
     return this.bigStorage.searchProof(utxoKey);
   }
@@ -125,11 +102,6 @@ export default class PlasmaWallet extends BaseWallet {
     }else{
       throw new Error('invalid UTXO');
     }
-  }
-
-  updateLoadedBlockNumber(n) {
-    this.loadedBlockNumber = n;
-    Storage.store('loadedBlockNumber', this.loadedBlockNumber);
   }
 
 }

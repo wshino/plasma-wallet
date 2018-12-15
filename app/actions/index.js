@@ -29,6 +29,11 @@ export function web3connect() {
   return async (dispatch) => {
     const wallet = new PlasmaWallet();
     await wallet.initWeb3();
+    const rootChainContract = new wallet.web3.eth.Contract(
+      RootChainArtifacts.abi,
+      RootChainAddress
+    );
+    wallet.setRootChainContract(rootChainContract);
     dispatch({
       type: WEB3_CONNECTED,
       payload: {
@@ -52,20 +57,8 @@ export function fetchBlockNumber() {
 
 export function deposit(eth) {
   return (dispatch, getState) => {
-    const web3 = getState().wallet.web3;
-    var rootChainContract = new web3.eth.Contract(
-      RootChainArtifacts.abi,
-      RootChainAddress
-    );
-    web3.eth.getAccounts().then((accounts) => {
-      return rootChainContract.methods.deposit(
-        OperatorAddress
-      ).send({
-        from: accounts[0],
-        gas: 200000,
-        value: (new BN("1000000000000000000")).mul(new BN(eth))
-      });
-    }).then(function(error, result) {
+    const wallet = getState().wallet;
+    return wallet.deposit(eth).then(function(error, result) {
       console.log("deposit: ", error, result);
       dispatch({
         type: DEPOSITED,
@@ -75,36 +68,10 @@ export function deposit(eth) {
   };
 }
 
-export function startExit(txList) {
+export function startExit(utxo) {
   return (dispatch, getState) => {
-    const web3 = getState().wallet.web3;
-    var rootChainContract = new web3.eth.Contract(
-      RootChainArtifacts.abi,
-      RootChainAddress
-    );
-    web3.eth.getAccounts().then((accounts) => {
-
-      const txListBytes = RLP.encode(txList);
-      const latestTx = txList[txList.length - 1];
-      console.log(
-        latestTx[0],
-        latestTx[4],
-        txList
-      )
-      console.log(utils.bufferToHex(txListBytes))
-
-      return rootChainContract.methods.startExit(
-        OperatorAddress,
-        latestTx[0],
-        latestTx[4],
-        utils.bufferToHex(txListBytes)
-      ).send({
-        from: accounts[0],
-        gas: 1000000,
-        // Exit Bond
-        // value: new BN("1000000000000000000")
-      })
-    }).then(function(error, result) {
+    const wallet = getState().wallet;
+    wallet.startExit(utxo).then(function(error, result) {
       console.log("startExit: ", error, result);
       dispatch({
         type: DEPOSITED,
