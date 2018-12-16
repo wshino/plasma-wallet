@@ -22,8 +22,7 @@ export const SEND_RAW_TRANSACTION = 'SEND_RAW_TRANSACTION';
 
 import RootChainArtifacts from '../assets/RootChain.json';
 
-const RootChainAddress = process.env.ROOTCHAIN_ADDRESS || '0x345ca3e014aaf5dca488057592ee47305d9b3e10';
-const OperatorAddress = process.env.OPERATOR_ADDRESS || '0x627306090abab3a6e1400e9345bc60c78a8bef57';
+const RootChainAddress = process.env.PLASMACHAIN_ADDRESS || '0x345ca3e014aaf5dca488057592ee47305d9b3e10';
 
 export function web3connect() {
   return async (dispatch) => {
