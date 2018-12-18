@@ -7,6 +7,8 @@ import {
   updateUTXO,
   deposit,
   startExit,
+  getExit,
+  finalizeExit,
   transfer
 } from './actions';
 import Styles from './style.css';
@@ -136,6 +138,18 @@ class App extends Component {
               }) 
               : null
           }
+          <p>Exit List</p>
+          {
+            this.props.wallet.getExits().map((exit, i) => {
+              return (
+                <div key={i}>
+                  {JSON.stringify(exit.utxo.value)}
+                  <button onClick={this.props.finalizeExit.bind(this, exit.exitPos)}>finalizeExit</button>
+                  <button onClick={this.props.getExit.bind(this, exit.exitPos)}>getExit</button>
+                </div>
+              );
+            })
+          }
           <p>balance</p>
           {
             this.props.utxos 
@@ -176,6 +190,8 @@ const mapDispatchToProps = {
   updateUTXO,
   deposit,
   startExit,
+  getExit,
+  finalizeExit,
   transfer
 };
 

@@ -18,6 +18,9 @@ export const FETCH_BLOCK_NUMBER = 'FETCH_BLOCK_NUMBER';
 export const FETCH_BLOCK = 'FETCH_BLOCK';
 export const UPDATE_UTXO = 'UPDATE_UTXO';
 export const DEPOSITED = 'DEPOSITED';
+export const START_EXIT = 'START_EXIT';
+export const GET_EXIT = 'GET_EXIT';
+export const FINALIZE_EXIT = 'FINALIZE_EXIT';
 export const SEND_RAW_TRANSACTION = 'SEND_RAW_TRANSACTION';
 
 import RootChainArtifacts from '../assets/RootChain.json';
@@ -73,7 +76,33 @@ export function startExit(utxo) {
     wallet.startExit(utxo).then(function(error, result) {
       console.log("startExit: ", error, result);
       dispatch({
-        type: DEPOSITED,
+        type: START_EXIT,
+        payload: {}
+      });
+    });
+  };
+}
+
+export function getExit(exitPos) {
+  return (dispatch, getState) => {
+    const wallet = getState().wallet;
+    wallet.getExit(exitPos).then(function(error, result) {
+      console.log("getExit: ", error, result);
+      dispatch({
+        type: GET_EXIT,
+        payload: {}
+      });
+    });
+  };
+}
+
+export function finalizeExit(exitPos) {
+  return (dispatch, getState) => {
+    const wallet = getState().wallet;
+    wallet.finalizeExit(exitPos).then(function(error, result) {
+      console.log("finalizeExit: ", error, result);
+      dispatch({
+        type: FINALIZE_EXIT,
         payload: {}
       });
     });
