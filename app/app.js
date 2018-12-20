@@ -20,6 +20,8 @@ import {
   updateUTXO,
   deposit,
   startExit,
+  getExit,
+  finalizeExit,
   transfer
 } from './actions';
 import Styles from './style.css';
@@ -43,7 +45,6 @@ class App extends Component {
     });
   }
     
-
   fetchBlockNumber() {
     this.props.fetchBlockNumber();
   }
@@ -89,6 +90,16 @@ class App extends Component {
     this.props.startExit(utxo);
   }
 
+  finalizeExit(exitPos) {
+    console.log('finalizeExit', exitPos);
+    this.props.finalizeExit(exitPos);
+  }
+  
+  getExit(exitPos) {
+    console.log('getExit', exitPos);
+    this.props.getExit(exitPos);
+  }
+
   onBlkNumChange(e) {
     this.setState({
       blkNum: e.target.value
@@ -104,7 +115,6 @@ class App extends Component {
   }
 
   render() {
-
     const { account } = this.state;
 
     if (!this.props.wallet) {
@@ -203,7 +213,9 @@ class App extends Component {
                             <Table.Cell>{JSON.stringify(utxo.value[0].start)}</Table.Cell>
                             <Table.Cell>{JSON.stringify(utxo.value[0].end)}</Table.Cell>
                             <Table.Cell>{JSON.stringify(utxo.blkNum)}</Table.Cell>
-                            <Table.Cell><Button onClick={this.startExit.bind(this, utxo)}>startExit</Button></Table.Cell>
+                            <Table.Cell>
+                              <Button onClick={this.startExit.bind(this, utxo)}>startExit</Button>
+                            </Table.Cell>
                           </Table.Row>
                         );
                       }) 
@@ -212,6 +224,19 @@ class App extends Component {
               </Table.Body>
             </Table>
 
+            {/* <Divider />
+            <p>Exit List</p>
+            {
+              this.props.wallet.getExit().map((exit, i) => {
+                return (
+                  <div key={i}>
+                    {JSON.stringify(exit.utxo.value)}
+                    <button onClick={this.props.finalizeExit.bind(this, exit.exitPos)}>finalizeExit</button>
+                    <button onClick={this.props.getExit.bind(this, exit.exitPos)}>getExit</button>
+                  </div>
+                );
+              })
+            } */}
 
             <Divider />
             <Header as='h2'>Block Number</Header>
@@ -219,7 +244,6 @@ class App extends Component {
               onChange={this.onBlkNumChange.bind(this)}
             />
             <Button onClick={this.fetchBlock.bind(this)}>fetchBlock</Button>
-
 
             <Divider />
             <Label as='a' color='teal'>Block Number: {this.props.blockNumber}</Label>
@@ -243,6 +267,8 @@ const mapDispatchToProps = {
   updateUTXO,
   deposit,
   startExit,
+  getExit,
+  finalizeExit,
   transfer
 };
 
