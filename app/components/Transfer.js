@@ -212,10 +212,10 @@ class Transfer extends Component {
             </Table.Body>
           </Table>
 
-          {/* <Divider />
+          <Divider />
           <p>Exit List</p>
           {
-            this.props.wallet.getExit().map((exit, i) => {
+            this.props.wallet.getExits().map((exit, i) => {
               return (
                 <div key={i}>
                   {JSON.stringify(exit.utxo.value)}
@@ -224,7 +224,7 @@ class Transfer extends Component {
                 </div>
               );
             })
-          } */}
+          }
 
           <Divider />
           <Header as='h2'>Block Number</Header>
