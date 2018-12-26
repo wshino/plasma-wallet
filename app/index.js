@@ -4,7 +4,7 @@ import { createStore, applyMiddleware, compose } from 'redux';
 import thunk from 'redux-thunk';
 import { Provider } from 'react-redux';
 import reducers from './reducers';
-import App from './components/app';
+import App from './components/App';
 import Transfer from './components/Transfer';
 import MultisigGame from './components/MultisigGame';
 import {
