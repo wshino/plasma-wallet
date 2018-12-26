@@ -37,6 +37,12 @@ class Transfer extends Component {
       account: ''
     };
   }
+
+  async componentDidMount() {
+    await this.props.updateUTXO();
+    await this.setState({account: this.props.wallet.getAddress()});
+  }
+
     
   fetchBlockNumber() {
     this.props.fetchBlockNumber();
