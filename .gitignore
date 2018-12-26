@@ -4,3 +4,6 @@ dist
 .env
 
 yarn-error.log
+
+# yarn.lock exists
+package-lock.json

@@ -1,5 +1,18 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+
+import { 
+  Button, 
+  Header,
+  Input,
+  Label,
+  Divider,
+  Loader,
+  Container,
+  List,
+  Table
+} from 'semantic-ui-react';
+
 import {
   web3connect,
   fetchBlockNumber,
@@ -18,18 +31,20 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      amount: 20000000000000000
+      amount: 20000000000000000,
+      account: ''
     };
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     // initialize web3
     window.addEventListener('load', async () => {
       const wallet = await this.props.web3connect();
       await this.props.updateUTXO();
+      await this.setState({account: wallet.getAddress()});
     });
   }
-
+    
   fetchBlockNumber() {
     this.props.fetchBlockNumber();
   }
@@ -75,6 +90,16 @@ class App extends Component {
     this.props.startExit(utxo);
   }
 
+  finalizeExit(exitPos) {
+    console.log('finalizeExit', exitPos);
+    this.props.finalizeExit(exitPos);
+  }
+  
+  getExit(exitPos) {
+    console.log('getExit', exitPos);
+    this.props.getExit(exitPos);
+  }
+
   onBlkNumChange(e) {
     this.setState({
       blkNum: e.target.value
@@ -90,93 +115,145 @@ class App extends Component {
   }
 
   render() {
+    const { account } = this.state;
+
     if (!this.props.wallet) {
       return (
-        <div> Loading wallet </div>
+        <Loader active>Loading</Loader>
       );
     }
     
     return (
       <div>
-        <div className={Styles.container}>
-          Plasma Sample Wallet!!
-          <div>
-            <p className={Styles['form-address']} >{this.props.wallet.getAddress()}</p>
-          </div>
-          <div>
-            <button onClick={this.deposit.bind(this, 1)}>Deposit 1 ether</button>
-            <button onClick={this.deposit.bind(this, 2)}>Deposit 2 ether</button>
-            <button onClick={this.deposit.bind(this, 10)}>Deposit 10 ether</button>
-          </div>
+        <div className={Styles['header-top']} >
+          <Container>
+            <Header as='h1'>Plasma Sample Wallet</Header>
+          </Container>   
         </div>
-        <div className={Styles.container}>
-          <span>blkNum</span>
-          <input
-            onChange={this.onBlkNumChange.bind(this)}
-          />
-          <button onClick={this.fetchBlock.bind(this)}>fetchBlock</button>
-          <p>Block Number: {this.props.blockNumber}</p>
-          <p>Block</p>
-          {
-            this.props.block 
-              ? this.props.block.txs.map(tx => { return (JSON.stringify(tx)); }) 
-              : null
-          }
-        </div>
-        <div className={Styles.container}>
-          <button onClick={this.updateUTXO.bind(this)}>updateUTXOs</button>
-          <p>UTXO List</p>
-          {
-            this.props.utxos 
-              ? this.props.utxos.map((utxo, i) => {
+        <div className={Styles['header-base']} >
+          <Container className={Styles['container-base']}>   
+            <Header as='h2'>Account</Header>
+            
+            {/* now we can't copy to clipboard. if you use copy to clipboard that you use library */}
+            <Input 
+              as='a' 
+              color='teal' 
+              action={{ 
+                color: 'teal',
+                labelPosition: 'right',
+                icon: 'copy',
+                content: 'Copy' 
+              }}
+              className={Styles['form-address']}
+              defaultValue={account} 
+            />
+            <div>
+              <Button onClick={this.deposit.bind(this, 1)}>Deposit 1 ether</Button>
+              <Button onClick={this.deposit.bind(this, 2)}>Deposit 2 ether</Button>
+              <Button onClick={this.deposit.bind(this, 10)}>Deposit 10 ether</Button>
+            </div>
+
+            <Header as='h2'>Balance</Header>
+            {
+              this.props.utxos 
+                ? (this.props.utxos
+                  .filter(utxo => {
+                    return utxo.state.length == 0 || utxo.state[0] === 0;
+                  }).reduce((acc, utxo) => {
+                    return acc.plus(utxo.value[0].end.div(1000000000000000000).minus(utxo.value[0].start.div(1000000000000000000)));
+                  }, BigNumber(0))).toString() 
+                : null
+            }
+
+            <Divider />
+            <div>
+              <Header as='h2'>To Address: </Header>
+              <Input 
+                className={Styles['form-input-address']}
+                onChange={this.onAddressChange.bind(this)}
+              />
+              <Input
+                placeholder="amount"
+                type="number"
+                value={this.state.amount}
+                className={Styles['form-input-address']}
+                onChange={this.onAmountChange.bind(this)}
+              />
+            </div>
+            <Button onClick={this.transfer.bind(this)}>transfer</Button>
+
+
+            <Divider />
+            <List>
+              <List.Item className={Styles['content-horizontal']}>
+                <List.Content>
+                  <Header as='h2'>UTXO List</Header>
+                </List.Content>
+                <List.Content floated='right' >
+                  <Button onClick={this.updateUTXO.bind(this)}>updateUTXOs</Button>
+                </List.Content>
+              </List.Item>
+            </List>
+            <Table celled fixed>
+              <Table.Header>
+                <Table.Row>
+                  <Table.HeaderCell>Start</Table.HeaderCell>
+                  <Table.HeaderCell>End</Table.HeaderCell>
+                  <Table.HeaderCell>BlkNum</Table.HeaderCell>
+                  <Table.HeaderCell>Exit</Table.HeaderCell>
+                </Table.Row>
+              </Table.Header>
+              <Table.Body>
+                {
+                  this.props.utxos 
+                    ? this.props.utxos
+                      .map((utxo, i) => {
+                        return (
+                          <Table.Row key={i} >
+                            <Table.Cell>{JSON.stringify(utxo.value[0].start)}</Table.Cell>
+                            <Table.Cell>{JSON.stringify(utxo.value[0].end)}</Table.Cell>
+                            <Table.Cell>{JSON.stringify(utxo.blkNum)}</Table.Cell>
+                            <Table.Cell>
+                              <Button onClick={this.startExit.bind(this, utxo)}>startExit</Button>
+                            </Table.Cell>
+                          </Table.Row>
+                        );
+                      }) 
+                    : null
+                }
+              </Table.Body>
+            </Table>
+
+            {/* <Divider />
+            <p>Exit List</p>
+            {
+              this.props.wallet.getExit().map((exit, i) => {
                 return (
                   <div key={i}>
-                    {JSON.stringify(utxo.value)}
-                    <button onClick={this.startExit.bind(this, utxo)}>startExit</button>
+                    {JSON.stringify(exit.utxo.value)}
+                    <button onClick={this.props.finalizeExit.bind(this, exit.exitPos)}>finalizeExit</button>
+                    <button onClick={this.props.getExit.bind(this, exit.exitPos)}>getExit</button>
                   </div>
                 );
-              }) 
-              : null
-          }
-          <p>Exit List</p>
-          {
-            this.props.wallet.getExits().map((exit, i) => {
-              return (
-                <div key={i}>
-                  {JSON.stringify(exit.utxo.value)}
-                  <button onClick={this.props.finalizeExit.bind(this, exit.exitPos)}>finalizeExit</button>
-                  <button onClick={this.props.getExit.bind(this, exit.exitPos)}>getExit</button>
-                </div>
-              );
-            })
-          }
-          <p>balance</p>
-          {
-            this.props.utxos 
-              ? (this.props.utxos.filter(utxo => {
-                return utxo.state.length == 0 || utxo.state[0] === 0;
-              }).reduce((acc, utxo) => {
-                return acc.plus(utxo.value[0].end.div(1000000000000000000).minus(utxo.value[0].start.div(1000000000000000000)));
-              }, BigNumber(0))).toString() 
-              : null
-          }
-        </div>
-        <div className={Styles.container}>
-          <div>
-            <span>To Address: </span>
-            <input 
-              className={Styles['form-input-address']}
-              onChange={this.onAddressChange.bind(this)}
+              })
+            } */}
+
+            <Divider />
+            <Header as='h2'>Block Number</Header>
+            <Input
+              onChange={this.onBlkNumChange.bind(this)}
             />
-            <input
-              placeholder="amount"
-              type="number"
-              value={this.state.amount}
-              className={Styles['form-input-address']}
-              onChange={this.onAmountChange.bind(this)}
-            />
-          </div>
-          <button onClick={this.transfer.bind(this)}>transfer</button>
+            <Button onClick={this.fetchBlock.bind(this)}>fetchBlock</Button>
+
+            <Divider />
+            <Label as='a' color='teal'>Block Number: {this.props.blockNumber}</Label>
+            <Header as='h3'>Block</Header>
+            {
+              this.props.block 
+                ? this.props.block.txs.map(tx => { return (JSON.stringify(tx)); }) 
+                : null
+            }
+          </Container>
         </div>
       </div>
     );
