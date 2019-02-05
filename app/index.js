@@ -4,7 +4,15 @@ import { createStore, applyMiddleware, compose } from 'redux';
 import thunk from 'redux-thunk';
 import { Provider } from 'react-redux';
 import reducers from './reducers';
-import App from './app';
+import App from './components/App';
+import Transfer from './components/Transfer';
+import MultisigGame from './components/MultisigGame';
+import {
+  BrowserRouter as Router,
+  Route,
+  Switch,
+  Redirect
+} from 'react-router-dom'
 
 const composeEnhancers =
   typeof window === 'object' &&
@@ -23,9 +31,27 @@ let store = createStore(
   enhancer
 );
 
+class WrapperApp extends React.Component {
+  render() {
+    return (
+      <div>
+        <App>
+          <Switch>
+            <Redirect exact={true} from="/" to="/transfer"/>
+            <Route path="/transfer" component={Transfer} />
+            <Route path="/game" component={MultisigGame} />
+          </Switch>
+        </App>
+      </div>
+    )
+  }
+}
+
 ReactDOM.render(
   <Provider store={store}>
-    <App />
+    <Router>
+      <WrapperApp />
+    </Router>
   </Provider>,
   document.getElementById('root')
 );
