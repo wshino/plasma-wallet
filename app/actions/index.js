@@ -1,10 +1,4 @@
-import utils from 'ethereumjs-util';
-
 import WalletFactory from '../helpers/wallet';
-import RLP from 'rlp';
-
-
-const BN = utils.BN;
 
 export const WEB3_CONNECTED = 'WEB3_CONNECTED';
 export const FETCH_BLOCK_NUMBER = 'FETCH_BLOCK_NUMBER';
@@ -20,6 +14,7 @@ export const SEND_RAW_TRANSACTION = 'SEND_RAW_TRANSACTION';
 export function web3connect() {
   return async (dispatch) => {
     const wallet = WalletFactory.createWallet()
+    await wallet.init()
     dispatch({
       type: WEB3_CONNECTED,
       payload: {

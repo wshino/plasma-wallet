@@ -20,7 +20,7 @@ export class WalletStorage {
   }
 
   add(key, item) {
-    window.localStorage.setItem(key, JSON.stringify(item));
+    window.localStorage.setItem(key, item);
   }
 
   get(key) {
