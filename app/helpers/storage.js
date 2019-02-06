@@ -1,22 +1,6 @@
 import { resolve } from 'path';
 
-export class Storage {
-
-  static store(key, item) {
-    window.localStorage.setItem(key, JSON.stringify(item));
-  }
-
-  static load(key) {
-    try {
-      return JSON.parse(window.localStorage.getItem(key));
-    }catch (e) {
-      return null;
-    }
-  }
-
-}
-
-export class BigStorage {
+export class WalletStorage {
 
   constructor() {
     this.indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
@@ -35,25 +19,41 @@ export class BigStorage {
     }
   }
 
-  add(utxoKey, blkNum, proof, txBytes, index) {
+  add(key, item) {
+    window.localStorage.setItem(key, item);
+  }
+
+  get(key) {
+    try {
+      return window.localStorage.getItem(key)
+    }catch (e) {
+      return null;
+    }
+  }
+
+  delete(key) {
+    window.localStorage.deleteItem(key)
+    return true
+  }
+
+  addProof(key, blkNum, value) {
     const storeName = 'proof';
     this.db.transaction(storeName, 'readwrite')
       .objectStore(storeName)
       .add({
-        id: utxoKey + '.' + blkNum,
-        utxoKey: utxoKey,
+        id: key + '.' + blkNum,
+        utxoKey: key,
         blkNum: blkNum,
-        proof: proof,
-        txBytes: txBytes,
-        index: index
+        value: value
       });
+    return Promise.resolve(true)
   }
 
-  get(utxoKey, blkNum) {
+  getProof(key, blkNum) {
     const storeName = 'proof'
     const request = this.db.transaction(storeName, 'readwrite')
       .objectStore(storeName)
-      .get(utxoKey + '.' + blkNum);
+      .get(key + '.' + blkNum);
     return new Promise((resolve, reject) => {
       request.onerror = function(event) {
         reject(event);
@@ -63,6 +63,7 @@ export class BigStorage {
       };
     });
   }
+
 
   lastTransactions(utxoKey) {
     const storeName = 'proof';

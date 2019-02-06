@@ -58,26 +58,10 @@ class Transfer extends Component {
   }
   
   transfer() {
-    const utxos = this.props.utxos;
     const amount = Number(this.state.amount);
-    const amounts = utxos.map((utxo, i) => {
-      return utxo.value[0].end - utxo.value[0].start;
-    });
-    let maxIndex = 0;
-    let maxAmount = 0;
-    amounts.forEach((a, i) => {
-      if(maxAmount < a && a > amount) {
-        maxAmount = a;
-        maxIndex = i;
-      }
-    });
-    const utxo = this.props.utxos[maxIndex];
-    if(utxo) {
-      this.props.transfer(
-        utxo,
-        this.state.toAddress,
-        amount);
-    }
+    this.props.transfer(
+      this.state.toAddress,
+      amount);
   }
 
   deposit(eth) {
@@ -136,21 +120,14 @@ class Transfer extends Component {
             defaultValue={account} 
           />
           <div>
-            <Button onClick={this.deposit.bind(this, 1)}>Deposit 1 ether</Button>
-            <Button onClick={this.deposit.bind(this, 2)}>Deposit 2 ether</Button>
-            <Button onClick={this.deposit.bind(this, 10)}>Deposit 10 ether</Button>
+            <Button onClick={this.deposit.bind(this, '1.0')}>Deposit 1 ether</Button>
+            <Button onClick={this.deposit.bind(this, '2.0')}>Deposit 2 ether</Button>
+            <Button onClick={this.deposit.bind(this, '10.0')}>Deposit 10 ether</Button>
           </div>
 
           <Header as='h2'>Balance</Header>
           {
-            this.props.utxos 
-              ? (this.props.utxos
-                .filter(utxo => {
-                  return utxo.state.length == 0 || utxo.state[0] === 0;
-                }).reduce((acc, utxo) => {
-                  return acc.plus(utxo.value[0].end.div(1000000000000000000).minus(utxo.value[0].start.div(1000000000000000000)));
-                }, BigNumber(0))).toString() 
-              : null
+            this.props.wallet.getBalance().toString()
           }
 
           <Divider />
@@ -198,8 +175,8 @@ class Transfer extends Component {
                     .map((utxo, i) => {
                       return (
                         <Table.Row key={i} >
-                          <Table.Cell>{JSON.stringify(utxo.value[0].start)}</Table.Cell>
-                          <Table.Cell>{JSON.stringify(utxo.value[0].end)}</Table.Cell>
+                          <Table.Cell>{JSON.stringify(utxo.getOutput().getSegment(0).start)}</Table.Cell>
+                          <Table.Cell>{JSON.stringify(utxo.getOutput().getSegment(0).end)}</Table.Cell>
                           <Table.Cell>{JSON.stringify(utxo.blkNum)}</Table.Cell>
                           <Table.Cell>
                             <Button onClick={this.startExit.bind(this, utxo)}>startExit</Button>
