@@ -58,7 +58,7 @@ class Transfer extends Component {
   }
   
   transfer() {
-    const amount = Number(this.state.amount);
+    const amount = this.state.amount;
     this.props.transfer(
       this.state.toAddress,
       amount);
