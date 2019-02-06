@@ -124,7 +124,7 @@ export function updateUTXO() {
 export function transfer(toAddress, amount) {
   return async (dispatch, getState) => {
     const wallet = getState().wallet;
-    await wallet.sendTransaction(toAddress, amount)
+    await wallet.transfer(toAddress, amount)
     dispatch({
       type: SEND_RAW_TRANSACTION,
       payload: {}

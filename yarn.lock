@@ -600,9 +600,9 @@
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/@iarna/toml/-/toml-2.2.1.tgz#82d0993d8882bb05e0645fbb4731d9e939e895b3"
 
-"@layer2/core@^0.0.10":
-  version "0.0.10"
-  resolved "https://registry.yarnpkg.com/@layer2/core/-/core-0.0.10.tgz#2b2067e47fce93c0f9f55358af62c1896b41c2a7"
+"@layer2/core@^0.0.12":
+  version "0.0.12"
+  resolved "https://registry.yarnpkg.com/@layer2/core/-/core-0.0.12.tgz#31cd1e4195b10f13042e69da09a6d5a46ebb52b7"
   dependencies:
     "@types/chai" "^4.1.7"
     "@types/mocha" "^5.2.5"
@@ -618,11 +618,11 @@
     ts-node "^7.0.1"
     typescript "^3.2.2"
 
-"@layer2/wallet@^0.0.10":
-  version "0.0.10"
-  resolved "https://registry.yarnpkg.com/@layer2/wallet/-/wallet-0.0.10.tgz#768f0bab5dca9f0fb5f58b30307f3ac7ae8cb555"
+"@layer2/wallet@^0.0.12":
+  version "0.0.12"
+  resolved "https://registry.yarnpkg.com/@layer2/wallet/-/wallet-0.0.12.tgz#a9b5104bfb94dc0c2de53e7fba6e1cb8e95f4053"
   dependencies:
-    "@layer2/core" "^0.0.10"
+    "@layer2/core" "^0.0.12"
     "@types/chai" "^4.1.7"
     "@types/mocha" "^5.2.5"
     "@types/node-fetch" "^2.1.4"

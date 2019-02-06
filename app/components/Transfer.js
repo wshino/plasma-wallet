@@ -58,7 +58,7 @@ class Transfer extends Component {
   }
   
   transfer() {
-    const amount = Number(this.state.amount);
+    const amount = this.state.amount;
     this.props.transfer(
       this.state.toAddress,
       amount);
@@ -170,21 +170,18 @@ class Transfer extends Component {
             </Table.Header>
             <Table.Body>
               {
-                this.props.utxos 
-                  ? this.props.utxos
-                    .map((utxo, i) => {
-                      return (
-                        <Table.Row key={i} >
-                          <Table.Cell>{JSON.stringify(utxo.getOutput().getSegment(0).start)}</Table.Cell>
-                          <Table.Cell>{JSON.stringify(utxo.getOutput().getSegment(0).end)}</Table.Cell>
-                          <Table.Cell>{JSON.stringify(utxo.blkNum)}</Table.Cell>
-                          <Table.Cell>
-                            <Button onClick={this.startExit.bind(this, utxo)}>startExit</Button>
-                          </Table.Cell>
-                        </Table.Row>
-                      );
-                    }) 
-                  : null
+                this.props.wallet.getUTXOArray().map((utxo, i) => {
+                  return (
+                    <Table.Row key={i} >
+                      <Table.Cell>{JSON.stringify(utxo.getOutput().getSegment(0).start.toString())}</Table.Cell>
+                      <Table.Cell>{JSON.stringify(utxo.getOutput().getSegment(0).end.toString())}</Table.Cell>
+                      <Table.Cell>{JSON.stringify(utxo.blkNum.toString())}</Table.Cell>
+                      <Table.Cell>
+                        <Button onClick={this.startExit.bind(this, utxo)}>startExit</Button>
+                      </Table.Cell>
+                    </Table.Row>
+                  );
+                })
               }
             </Table.Body>
           </Table>
