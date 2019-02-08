@@ -120,9 +120,9 @@ class Transfer extends Component {
             defaultValue={account} 
           />
           <div>
-            <Button onClick={this.deposit.bind(this, '1.0')}>Deposit 1 ether</Button>
-            <Button onClick={this.deposit.bind(this, '2.0')}>Deposit 2 ether</Button>
-            <Button onClick={this.deposit.bind(this, '10.0')}>Deposit 10 ether</Button>
+            <Button onClick={this.deposit.bind(this, '0.01')}>Deposit 0.01 ether</Button>
+            <Button onClick={this.deposit.bind(this, '0.02')}>Deposit 0.02 ether</Button>
+            <Button onClick={this.deposit.bind(this, '0.1')}>Deposit 0.1 ether</Button>
           </div>
 
           <Header as='h2'>Balance</Header>
