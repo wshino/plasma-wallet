@@ -33,7 +33,7 @@ class Transfer extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      amount: 20000000000000000,
+      amount: 200000000,
       account: ''
     };
   }
