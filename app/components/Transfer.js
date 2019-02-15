@@ -128,7 +128,7 @@ class Transfer extends Component {
           <Header as='h2'>Balance</Header>
           {
             this.props.wallet.getBalance().toString()
-          }
+          } GWEI
 
           <Divider />
           <div>
@@ -192,9 +192,10 @@ class Transfer extends Component {
             this.props.wallet.getExits().map((exit, i) => {
               return (
                 <div key={i}>
-                  {JSON.stringify(exit.utxo.value)}
-                  <button onClick={this.props.finalizeExit.bind(this, exit.exitPos)}>finalizeExit</button>
-                  <button onClick={this.props.getExit.bind(this, exit.exitPos)}>getExit</button>
+                  Exit {exit.getId()}.
+                  You can withdraw {exit.getAmount()} gwei at {new Date(exit.getExitableAt()).toLocaleString()}.
+                  <button onClick={this.props.finalizeExit.bind(this, exit.getId())}>finalizeExit</button>
+                  <button onClick={this.props.getExit.bind(this, exit.getId())}>getExit</button>
                 </div>
               );
             })
