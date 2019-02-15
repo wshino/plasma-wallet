@@ -14,7 +14,9 @@ export const SEND_RAW_TRANSACTION = 'SEND_RAW_TRANSACTION';
 export function web3connect() {
   return async (dispatch) => {
     const wallet = WalletFactory.createWallet()
-    await wallet.init()
+    await wallet.init(() => {
+      console.log('wallet state updated.')
+    })
     dispatch({
       type: WEB3_CONNECTED,
       payload: {
@@ -109,7 +111,7 @@ export function fetchBlock(blkNum) {
 export function updateUTXO() {
   return (dispatch, getState) => {
     const wallet = getState().wallet;
-    wallet.updateBlocks().then(() => {
+    wallet.syncChildChain().then(() => {
       console.log('utxos', wallet.utxos);
       const utxos = Object.keys(wallet.utxos).map(k => wallet.utxos[k])
       dispatch({
