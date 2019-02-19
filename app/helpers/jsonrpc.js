@@ -25,7 +25,7 @@ export class JsonRpcClient {
     })
     .then(response => {
       return response.json()
-    });
+    })
   }
 
 }
