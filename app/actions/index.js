@@ -1,6 +1,7 @@
 import WalletFactory from '../helpers/wallet';
 
 export const WEB3_CONNECTED = 'WEB3_CONNECTED';
+export const FETCH_BALANCE_OF_MAINCHAIN = 'FETCH_BALANCE_OF_MAINCHAIN';
 export const FETCH_BLOCK_NUMBER = 'FETCH_BLOCK_NUMBER';
 export const FETCH_BLOCK = 'FETCH_BLOCK';
 export const UPDATE_UTXO = 'UPDATE_UTXO';
@@ -9,13 +10,21 @@ export const START_EXIT = 'START_EXIT';
 export const GET_EXIT = 'GET_EXIT';
 export const FINALIZE_EXIT = 'FINALIZE_EXIT';
 export const SEND_RAW_TRANSACTION = 'SEND_RAW_TRANSACTION';
-
+export const MERGE_TRANSACTION = 'MERGE_TRANSACTION';
+export const DEFRAGMENTATION_START = 'DEFRAGMENTATION_START';
+export const DEFRAGMENTATION_UPDATE = 'DEFRAGMENTATION_UPDATE';
+export const UPDATE_WALLET = 'UPDATE_WALLET';
 
 export function web3connect() {
   return async (dispatch) => {
     const wallet = WalletFactory.createWallet()
-    await wallet.init(() => {
-      console.log('wallet state updated.')
+    await wallet.init((wallet) => {
+      dispatch({
+        type: UPDATE_WALLET,
+        payload: {
+          wallet: wallet
+        }
+      });
     })
     dispatch({
       type: WEB3_CONNECTED,
@@ -36,6 +45,17 @@ export function fetchBlockNumber() {
     });
   };
 }
+
+export function fetchBalanceOfMainChain() {
+  return async (dispatch, getState) => {
+    const wallet = getState().wallet;
+    dispatch({
+      type: FETCH_BALANCE_OF_MAINCHAIN,
+      payload: await wallet.getBalanceOfMainChain()
+    });
+  };
+}
+
 
 export function deposit(eth) {
   return (dispatch, getState) => {
@@ -112,7 +132,6 @@ export function updateUTXO() {
   return (dispatch, getState) => {
     const wallet = getState().wallet;
     wallet.syncChildChain().then(() => {
-      console.log('utxos', wallet.utxos);
       const utxos = Object.keys(wallet.utxos).map(k => wallet.utxos[k])
       dispatch({
         type: UPDATE_UTXO,
@@ -130,6 +149,37 @@ export function transfer(toAddress, amount) {
     dispatch({
       type: SEND_RAW_TRANSACTION,
       payload: {}
+    });
+  };
+}
+
+export function merge() {
+  return async (dispatch, getState) => {
+    const wallet = getState().wallet;
+    await wallet.merge()
+    dispatch({
+      type: MERGE_TRANSACTION,
+      payload: {}
+    });
+  };
+}
+
+export function startDefragmentation() {
+  return async (dispatch, getState) => {
+    const wallet = getState().wallet;
+    await wallet.startDefragmentation((message) => {
+      dispatch({
+        type: DEFRAGMENTATION_UPDATE,
+        payload: {
+          message: message
+        }
+      });
+    })
+    dispatch({
+      type: DEFRAGMENTATION_START,
+      payload: {
+        message: 'start'
+      }
     });
   };
 }

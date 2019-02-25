@@ -600,9 +600,9 @@
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/@iarna/toml/-/toml-2.2.1.tgz#82d0993d8882bb05e0645fbb4731d9e939e895b3"
 
-"@layer2/core@^0.0.20":
-  version "0.0.20"
-  resolved "https://registry.yarnpkg.com/@layer2/core/-/core-0.0.20.tgz#3854bdf3877b6ea84d45820e00992be1f1a16ef6"
+"@layer2/core@^0.0.25":
+  version "0.0.25"
+  resolved "https://registry.yarnpkg.com/@layer2/core/-/core-0.0.25.tgz#f5710281f2140c0930e6ead9bcd7ed3b65677bd1"
   dependencies:
     "@types/chai" "^4.1.7"
     "@types/chai-as-promised" "^7.1.0"
@@ -619,11 +619,11 @@
     ts-node "^7.0.1"
     typescript "^3.2.2"
 
-"@layer2/wallet@^0.0.20":
-  version "0.0.20"
-  resolved "https://registry.yarnpkg.com/@layer2/wallet/-/wallet-0.0.20.tgz#07b1c6afc07b8ec2e90d8f049b73117e28f8d439"
+"@layer2/wallet@^0.0.25":
+  version "0.0.25"
+  resolved "https://registry.yarnpkg.com/@layer2/wallet/-/wallet-0.0.25.tgz#7a93e75b6b01d94abd1640a250dcd078cb9496b6"
   dependencies:
-    "@layer2/core" "^0.0.20"
+    "@layer2/core" "^0.0.25"
     "@types/chai" "^4.1.7"
     "@types/chai-as-promised" "^7.1.0"
     "@types/mocha" "^5.2.5"
