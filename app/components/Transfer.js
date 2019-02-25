@@ -17,6 +17,7 @@ import {
 } from 'semantic-ui-react';
 
 import {
+  fetchBalanceOfMainChain,
   fetchBlockNumber,
   fetchBlock,
   updateUTXO,
@@ -24,7 +25,9 @@ import {
   startExit,
   getExit,
   finalizeExit,
-  transfer
+  transfer,
+  merge,
+  startDefragmentation
 } from './../actions';
 import Styles from './style.css';
 import BigNumber from 'bignumber.js';
@@ -33,13 +36,14 @@ class Transfer extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      amount: 200000000,
+      amount: 200,
       account: ''
     };
   }
 
   async componentDidMount() {
     await this.props.updateUTXO();
+    await this.props.fetchBalanceOfMainChain();
     await this.setState({account: this.props.wallet.getAddress()});
   }
 
@@ -61,7 +65,7 @@ class Transfer extends Component {
     const amount = this.state.amount;
     this.props.transfer(
       this.state.toAddress,
-      amount);
+      String(Number(amount) * 1000000) );
   }
 
   deposit(eth) {
@@ -99,7 +103,7 @@ class Transfer extends Component {
 
   render() {
     const { account } = this.state;
-    
+    console.log(this.props.mainchainBalance)
     return (
       <div className={Styles['header-base']} >
         <Container className={Styles['container-base']}>   
@@ -124,11 +128,16 @@ class Transfer extends Component {
             <Button onClick={this.deposit.bind(this, '2.0')}>Deposit 2 ether</Button>
             <Button onClick={this.deposit.bind(this, '10.0')}>Deposit 10 ether</Button>
           </div>
-
+          
           <Header as='h2'>Balance</Header>
           {
-            this.props.wallet.getBalance().toString()
-          } GWEI
+            this.props.wallet.getBalance().div(1000000).toString()
+          } Finney
+          (
+          {
+            this.props.mainchainBalance ? this.props.mainchainBalance.div(1000000000000000).toString() : 0
+          } Finney(Main Chain)
+          )
 
           <Divider />
           <div>
@@ -187,6 +196,10 @@ class Transfer extends Component {
           </Table>
 
           <Divider />
+          <Button onClick={this.props.startDefragmentation}>Start Defragmentation</Button>
+          <div>defragmentation status: {this.props.message}</div>
+
+          <Divider />
           <p>Exit List</p>
           {
             this.props.wallet.getExits().map((exit, i) => {
@@ -208,14 +221,6 @@ class Transfer extends Component {
           />
           <Button onClick={this.fetchBlock.bind(this)}>fetchBlock</Button>
 
-          <Divider />
-          <Label as='a' color='teal'>Block Number: {this.props.blockNumber}</Label>
-          <Header as='h3'>Block</Header>
-          {
-            this.props.block 
-              ? this.props.block.txs.map(tx => { return (JSON.stringify(tx)); }) 
-              : null
-          }
         </Container>
       </div>
     );
@@ -223,6 +228,7 @@ class Transfer extends Component {
 }
 
 const mapDispatchToProps = {
+  fetchBalanceOfMainChain,
   fetchBlockNumber,
   fetchBlock,
   updateUTXO,
@@ -230,15 +236,20 @@ const mapDispatchToProps = {
   startExit,
   getExit,
   finalizeExit,
-  transfer
+  transfer,
+  merge,
+  startDefragmentation
 };
 
 const mapStateToProps = (state) => ({
   wallet: state.wallet,
+  balance: state.balance,
+  mainchainBalance: state.mainchainBalance,
   blockNumber: state.blockNumber,
   block: state.block,
   utxos: state.utxos,
-  txResult: state.txResult
+  txResult: state.txResult,
+  message: state.message
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Transfer);
