@@ -18,14 +18,6 @@ export const UPDATE_WALLET = 'UPDATE_WALLET';
 export function web3connect() {
   return async (dispatch) => {
     const wallet = WalletFactory.createWallet()
-    await wallet.init((wallet) => {
-      dispatch({
-        type: UPDATE_WALLET,
-        payload: {
-          wallet: wallet
-        }
-      });
-    })
     dispatch({
       type: WEB3_CONNECTED,
       payload: {
