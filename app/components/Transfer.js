@@ -45,6 +45,10 @@ class Transfer extends Component {
     await this.props.updateUTXO();
     await this.props.fetchBalanceOfMainChain();
     await this.setState({account: this.props.wallet.getAddress()});
+    await this.props.wallet.init(async (wallet) => {
+      await this.props.updateUTXO();
+      this.forceUpdate()
+    })    
   }
 
     
