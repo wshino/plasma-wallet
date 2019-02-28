@@ -1,6 +1,9 @@
 node_modules
 .cache
-dist
+dist/*.css
+dist/*.js
+dist/*.map
+dist/*.html
 .env
 
 yarn-error.log
