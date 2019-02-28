@@ -50,16 +50,20 @@ export function fetchBalanceOfMainChain() {
 
 
 export function deposit(eth) {
-  return (dispatch, getState) => {
+  return async (dispatch, getState) => {
     const wallet = getState().wallet;
-    return wallet.deposit(eth).then(function(error, result) {
-      console.log("deposit: ", error, result);
+    const result = await wallet.deposit(eth)
+    dispatch({
+      type: DEPOSITED,
+      payload: result
+    });
+    setTimeout(() => {
       dispatch({
         type: DEPOSITED,
-        payload: {}
+        payload: null
       });
-    });
-  };
+    }, 10000)    
+  }
 }
 
 export function startExit(tx) {
@@ -137,11 +141,17 @@ export function updateUTXO() {
 export function transfer(toAddress, amount) {
   return async (dispatch, getState) => {
     const wallet = getState().wallet;
-    await wallet.transfer(toAddress, amount)
+    const result = await wallet.transfer(toAddress, amount)
     dispatch({
       type: SEND_RAW_TRANSACTION,
-      payload: {}
+      payload: result
     });
+    setTimeout(() => {
+      dispatch({
+        type: SEND_RAW_TRANSACTION,
+        payload: null
+      });
+    }, 10000)
   };
 }
 
