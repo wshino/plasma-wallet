@@ -1,6 +1,7 @@
 import {
   WEB3_CONNECTED,
   UPDATE_WALLET,
+  DEPOSITED,
   FETCH_BLOCK_NUMBER,
   FETCH_BLOCK,
   UPDATE_UTXO,
@@ -19,14 +20,12 @@ export const handlers = {
         ...state,
         wallet:
         action.payload.wallet
-//        balance: action.payload.wallet.getBalance()
       }
     },
     [UPDATE_WALLET]: (state, action) => {
       return {
         ...state,
         wallet: action.payload.wallet
-//        balance: action.payload.wallet.getBalance()
       }
     },
     [FETCH_BALANCE_OF_MAINCHAIN]: (state, action) => {
@@ -40,6 +39,9 @@ export const handlers = {
     },
     [UPDATE_UTXO]: (state, action) => {
       return { ...state, utxos: action.payload }
+    },
+    [DEPOSITED]: (state, action) => {
+      return { ...state, depositResult: action.payload };
     },
     [SEND_RAW_TRANSACTION]: (state, action) => {
       return { ...state, txResult: action.payload };

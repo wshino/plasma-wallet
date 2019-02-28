@@ -30,7 +30,6 @@ import {
   startDefragmentation
 } from './../actions';
 import Styles from './style.css';
-import BigNumber from 'bignumber.js';
 
 class Transfer extends Component {
   constructor(props) {
@@ -105,13 +104,34 @@ class Transfer extends Component {
     this.setState({amount: e.target.value});
   }
 
+  
+  getDepositResultMessage() {
+    const { depositResult } = this.props
+    if(depositResult) {
+      if(depositResult.isOk()) {
+        return 'Deposit succeeded. please wait a while.'
+      } else {
+        return `Failed to depsoit because of ${depositResult.error().message}`
+      }
+    }
+  }
+
+  getTxResultMessage() {
+    const { txResult } = this.props
+    if(txResult) {
+      if(txResult.isOk()) {
+        return 'Transfer succeeded. please wait a while.'
+      } else {
+        return `Failed to transfer because of ${txResult.error().message}`
+      }
+    }
+  }
+
   render() {
     const { account } = this.state;
-    console.log(this.props.mainchainBalance)
     return (
       <div className={Styles['header-base']} >
         <Container className={Styles['container-base']}>   
-          <Link to="/game">Game</Link>
           <Header as='h2'>Account</Header>
           
           {/* now we can't copy to clipboard. if you use copy to clipboard that you use library */}
@@ -128,10 +148,11 @@ class Transfer extends Component {
             defaultValue={account} 
           />
           <div>
+            <Button onClick={this.deposit.bind(this, '0.2')}>Deposit 0.2 ether</Button>
+            <Button onClick={this.deposit.bind(this, '0.5')}>Deposit 0.5 ether</Button>
             <Button onClick={this.deposit.bind(this, '1.0')}>Deposit 1 ether</Button>
-            <Button onClick={this.deposit.bind(this, '2.0')}>Deposit 2 ether</Button>
-            <Button onClick={this.deposit.bind(this, '10.0')}>Deposit 10 ether</Button>
           </div>
+          <div>{this.getDepositResultMessage()}</div>
           
           <Header as='h2'>Balance</Header>
           {
@@ -159,16 +180,13 @@ class Transfer extends Component {
             />
           </div>
           <Button onClick={this.transfer.bind(this)}>transfer</Button>
-
+          <div>{this.getTxResultMessage()}</div>
 
           <Divider />
           <List>
             <List.Item className={Styles['content-horizontal']}>
               <List.Content>
                 <Header as='h2'>UTXO List</Header>
-              </List.Content>
-              <List.Content floated='right' >
-                <Button onClick={this.updateUTXO.bind(this)}>updateUTXOs</Button>
               </List.Content>
             </List.Item>
           </List>
@@ -218,13 +236,6 @@ class Transfer extends Component {
             })
           }
 
-          <Divider />
-          <Header as='h2'>Block Number</Header>
-          <Input
-            onChange={this.onBlkNumChange.bind(this)}
-          />
-          <Button onClick={this.fetchBlock.bind(this)}>fetchBlock</Button>
-
         </Container>
       </div>
     );
@@ -252,6 +263,7 @@ const mapStateToProps = (state) => ({
   blockNumber: state.blockNumber,
   block: state.block,
   utxos: state.utxos,
+  depositResult: state.depositResult,
   txResult: state.txResult,
   message: state.message
 });
