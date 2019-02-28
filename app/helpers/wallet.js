@@ -19,13 +19,25 @@ export default class WalletFactory {
     const client = new PlasmaClient(jsonRpcClient)
     const storage = new WalletStorage()
     const privateKey = storage.get('privateKey')
-    return ChamberWallet.createWalletWithPrivateKey(
-      client,
-      process.env.ROOTCHAIN_ENDPOINT || 'http://127.0.0.1:8545',
-      process.env.ROOTCHAIN_ADDRESS || '0x30753E4A8aad7F8597332E813735Def5dD395028',
-      storage,
-      privateKey?privateKey:'0xc87509a1c067bbde78beb793e6fa76530b6382a4c0241e5e4a9ec0a0f44dc0d3',
-    )
+    if(privateKey) {
+      return ChamberWallet.createWalletWithPrivateKey(
+        client,
+        process.env.ROOTCHAIN_ENDPOINT || 'http://127.0.0.1:8545',
+        process.env.ROOTCHAIN_ADDRESS || '0x30753E4A8aad7F8597332E813735Def5dD395028',
+        storage,
+        privateKey
+      )
+    } else {
+      const wallet = ChamberWallet.createRandomWallet(
+        client,
+        process.env.ROOTCHAIN_ENDPOINT || 'http://127.0.0.1:8545',
+        process.env.ROOTCHAIN_ADDRESS || '0x30753E4A8aad7F8597332E813735Def5dD395028',
+        storage
+      )
+      storage.add('privateKey', wallet.wallet.privateKey)
+      location.reload()
+      return wallet
+    }
   }
 
 }
