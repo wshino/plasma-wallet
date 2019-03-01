@@ -43,7 +43,7 @@ class App extends Component {
       <div>
         <div className={Styles['header-top']} >
           <Container>
-            <Header as='h1'>Plasma Sample Wallet</Header>
+            <Header as='h1'>Plasma Sample Wallet (kovan version)</Header>
           </Container>   
         </div>
         {this.props.children}
