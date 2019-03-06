@@ -25,7 +25,6 @@ class App extends Component {
     // initialize web3
     window.addEventListener('load', async () => {
       const wallet = await this.props.web3connect();
-      await this.props.updateUTXO();
       await this.setState({account: wallet.getAddress()});
     });
   }

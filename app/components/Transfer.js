@@ -41,11 +41,10 @@ class Transfer extends Component {
   }
 
   async componentDidMount() {
-    await this.props.updateUTXO();
     await this.props.fetchBalanceOfMainChain();
     await this.setState({account: this.props.wallet.getAddress()});
     await this.props.wallet.init(async (wallet) => {
-      await this.props.updateUTXO();
+      await wallet.syncChildChain()
       this.forceUpdate()
     })    
   }
@@ -262,7 +261,6 @@ const mapStateToProps = (state) => ({
   mainchainBalance: state.mainchainBalance,
   blockNumber: state.blockNumber,
   block: state.block,
-  utxos: state.utxos,
   depositResult: state.depositResult,
   txResult: state.txResult,
   message: state.message

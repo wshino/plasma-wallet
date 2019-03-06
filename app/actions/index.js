@@ -124,20 +124,6 @@ export function fetchBlock(blkNum) {
   };
 }
 
-export function updateUTXO() {
-  return (dispatch, getState) => {
-    const wallet = getState().wallet;
-    wallet.syncChildChain().then(() => {
-      const utxos = Object.keys(wallet.utxos).map(k => wallet.utxos[k])
-      dispatch({
-        type: UPDATE_UTXO,
-        payload: utxos
-      });
-    });
-  };
-}
-
-
 export function transfer(toAddress, amount) {
   return async (dispatch, getState) => {
     const wallet = getState().wallet;
