@@ -6,6 +6,7 @@ export const FETCH_BLOCK_NUMBER = 'FETCH_BLOCK_NUMBER';
 export const FETCH_BLOCK = 'FETCH_BLOCK';
 export const UPDATE_UTXO = 'UPDATE_UTXO';
 export const DEPOSITED = 'DEPOSITED';
+export const VERIFY_HISTORY = 'VERIFY_HISTORY';
 export const START_EXIT = 'START_EXIT';
 export const GET_EXIT = 'GET_EXIT';
 export const FINALIZE_EXIT = 'FINALIZE_EXIT';
@@ -64,6 +65,16 @@ export function deposit(eth) {
       });
     }, 10000)    
   }
+}
+
+export function verifyHistory(utxo) {
+  return (dispatch, getState) => {
+    const wallet = getState().wallet;
+    dispatch({
+      type: VERIFY_HISTORY,
+      payload: wallet.verifyHistory(utxo)
+    });
+  };
 }
 
 export function startExit(tx) {

@@ -22,6 +22,7 @@ import {
   fetchBlock,
   updateUTXO,
   deposit,
+  verifyHistory,
   startExit,
   getExit,
   finalizeExit,
@@ -74,6 +75,10 @@ class Transfer extends Component {
     this.props.deposit(eth);
   }
 
+  verify(utxo) {
+    this.props.verifyHistory(utxo);
+  }
+
   startExit(utxo) {
     console.log('startExit', utxo);
     this.props.startExit(utxo);
@@ -83,7 +88,7 @@ class Transfer extends Component {
     console.log('finalizeExit', exitPos);
     this.props.finalizeExit(exitPos);
   }
-  
+
   getExit(exitPos) {
     console.log('getExit', exitPos);
     this.props.getExit(exitPos);
@@ -195,6 +200,8 @@ class Transfer extends Component {
                 <Table.HeaderCell>Start</Table.HeaderCell>
                 <Table.HeaderCell>End</Table.HeaderCell>
                 <Table.HeaderCell>BlkNum</Table.HeaderCell>
+                <Table.HeaderCell>Verified</Table.HeaderCell>
+                <Table.HeaderCell>Verify</Table.HeaderCell>
                 <Table.HeaderCell>Exit</Table.HeaderCell>
               </Table.Row>
             </Table.Header>
@@ -206,6 +213,10 @@ class Transfer extends Component {
                       <Table.Cell>{JSON.stringify(utxo.getOutput().getSegment(0).start.toString())}</Table.Cell>
                       <Table.Cell>{JSON.stringify(utxo.getOutput().getSegment(0).end.toString())}</Table.Cell>
                       <Table.Cell>{JSON.stringify(utxo.blkNum.toString())}</Table.Cell>
+                      <Table.Cell>{JSON.stringify(utxo.verifiedFlag)}</Table.Cell>
+                      <Table.Cell>
+                        <Button onClick={this.verify.bind(this, utxo)}>verify</Button>
+                      </Table.Cell>
                       <Table.Cell>
                         <Button onClick={this.startExit.bind(this, utxo)}>startExit</Button>
                       </Table.Cell>
@@ -247,6 +258,7 @@ const mapDispatchToProps = {
   fetchBlock,
   updateUTXO,
   deposit,
+  verifyHistory,
   startExit,
   getExit,
   finalizeExit,
