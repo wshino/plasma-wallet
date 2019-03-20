@@ -3,11 +3,17 @@ import {
   PlasmaClient
 } from '@layer2/wallet';
 import {
+  OwnState
+} from '@layer2/core';
+import {
   WalletStorage
 } from './storage';
 import {
   JsonRpcClient
 } from './jsonrpc'
+
+// should set up state verifier's address
+OwnState.setAddress('0x9fbda871d559710256a2502a2517b794b482db40')
 
 /**
  * Plasma wallet store UTXO and proof
