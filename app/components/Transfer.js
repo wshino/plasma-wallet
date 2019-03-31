@@ -138,19 +138,9 @@ class Transfer extends Component {
         <Container className={Styles['container-base']}>   
           <Header as='h2'>Account</Header>
           
-          {/* now we can't copy to clipboard. if you use copy to clipboard that you use library */}
-          <Input 
-            as='a' 
-            color='teal' 
-            action={{ 
-              color: 'teal',
-              labelPosition: 'right',
-              icon: 'copy',
-              content: 'Copy' 
-            }}
-            className={Styles['form-address']}
-            defaultValue={account} 
-          />
+          <div className={Styles['form-address-wrap']}>
+            <p className={Styles['form-address']}>{account}</p>
+          </div>
           <div>
             <Button onClick={this.deposit.bind(this, '0.2')}>Deposit 0.2 ether</Button>
             <Button onClick={this.deposit.bind(this, '0.5')}>Deposit 0.5 ether</Button>
