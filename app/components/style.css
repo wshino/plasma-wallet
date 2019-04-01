@@ -14,16 +14,26 @@ input {
 
 .form-address {
   border: 0;
-  padding: 2px;
   font-size: 1.0em;
   color: #333;
   border: solid 1px #ccc;
   margin: 0 0 20px;
   width: 380px;
+  padding: 0.68em 1em;
+  border-radius: 4px;
 }
 
-/* className .container is used by semantic-ui-react */ 
+.form-address-wrap {
+  border: 0;
+  padding: 2px;
+  font-size: 1.0em;
+  color: #333;
+  border: solid 1px #ccc;
+  margin: 0 0 20px;
+  width: 386px;
+}
 
+/* className .container is used by semantic-ui-react */
 .container {
   background-color: #ccc;
   padding: 10px;
