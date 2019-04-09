@@ -9,7 +9,8 @@ import {
   SEND_RAW_TRANSACTION,
   FETCH_BALANCE_OF_MAINCHAIN,
   DEFRAGMENTATION_START,
-  DEFRAGMENTATION_UPDATE
+  DEFRAGMENTATION_UPDATE,
+  TRANSFER_RECEIVED
 } from '../actions';
 
 const defaultState = {};
@@ -55,6 +56,9 @@ export const handlers = {
     },
     [DEFRAGMENTATION_UPDATE]: (state, action) => {
       return { ...state, message: action.payload.message };
+    },
+    [TRANSFER_RECEIVED]: (state, action) => {
+      return { ...state, received: action.payload };
     }
   }
 }  

@@ -16,10 +16,29 @@ export const MERGE_TRANSACTION = 'MERGE_TRANSACTION';
 export const DEFRAGMENTATION_START = 'DEFRAGMENTATION_START';
 export const DEFRAGMENTATION_UPDATE = 'DEFRAGMENTATION_UPDATE';
 export const UPDATE_WALLET = 'UPDATE_WALLET';
+export const TRANSFER_RECEIVED = 'TRANSFER_RECEIVED';
 
 export function web3connect() {
   return async (dispatch) => {
     const wallet = WalletFactory.createWallet()
+    wallet.on('receive', (e) => {
+      console.log('received', e)
+      if(e.isFast) {
+        // window.alert('received FF! amount is ' + e.tx.getSegments()[0].getAmount().toString(),)
+      } else {
+        // window.alert('received! amount is ' + e.tx.getOutput().getSegment(0).getAmount().toString(),)
+      }
+      dispatch({
+        type: TRANSFER_RECEIVED,
+        payload: e
+      });
+      setTimeout(() => {
+        dispatch({
+          type: TRANSFER_RECEIVED,
+          payload: null
+        });
+      }, 10000)
+    })
     dispatch({
       type: WEB3_CONNECTED,
       payload: {

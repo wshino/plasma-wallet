@@ -1,11 +1,14 @@
+import * as mqtt from 'mqtt'
 import {
   ChamberWallet,
   PlasmaClient,
-  BrowserStorage
+  BrowserStorage,
+  WalletMQTTClient
 } from '@layer2/wallet';
 import {
   JsonRpcClient
 } from './jsonrpc'
+
 
 /**
  * Plasma wallet store UTXO and proof
@@ -14,7 +17,7 @@ export default class WalletFactory {
 
   static createWallet() {
     const jsonRpcClient = new JsonRpcClient(process.env.CHILDCHAIN_ENDPOINT || 'http://localhost:3000')
-    const client = new PlasmaClient(jsonRpcClient)
+    const client = new PlasmaClient(jsonRpcClient, new WalletMQTTClient(process.env.CHILDCHAIN_PUBSUB_ENDPOINT || childChainEndpoint))
     const storage = new BrowserStorage()
     const privateKey = localStorage.getItem('privateKey')
     const options = {
