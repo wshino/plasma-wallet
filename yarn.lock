@@ -600,9 +600,10 @@
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/@iarna/toml/-/toml-2.2.1.tgz#82d0993d8882bb05e0645fbb4731d9e939e895b3"
 
-"@layer2/core@^0.0.34":
-  version "0.0.34"
-  resolved "https://registry.yarnpkg.com/@layer2/core/-/core-0.0.34.tgz#365b19c654b82e17c38449167c56ed21a12f9c54"
+"@layer2/core@^0.0.39":
+  version "0.0.39"
+  resolved "https://registry.yarnpkg.com/@layer2/core/-/core-0.0.39.tgz#e82c2f051d020b92f6912d76d229bc355a395500"
+  integrity sha512-VYlDtShABumiWYhReg6rV927+pQE63bYfLdaaYGdAxkt/5h1eTU1Ex8ZZCfYxfXX5A0wRUN8qB97RGtRR+wOVg==
   dependencies:
     "@types/chai" "^4.1.7"
     "@types/chai-as-promised" "^7.1.0"
@@ -617,19 +618,21 @@
     tslib "^1.9.3"
     typescript "^3.2.2"
 
-"@layer2/events-watcher@^0.0.34":
-  version "0.0.34"
-  resolved "https://registry.yarnpkg.com/@layer2/events-watcher/-/events-watcher-0.0.34.tgz#4e2a2243b7db51205fb4d598071d42df682d6754"
+"@layer2/events-watcher@^0.0.39":
+  version "0.0.39"
+  resolved "https://registry.yarnpkg.com/@layer2/events-watcher/-/events-watcher-0.0.39.tgz#f82077f7902c7c88b6fd91ba6421306989f7dd02"
+  integrity sha512-QEx9ExIXbnpkoCBFir8oRDo5isszWoEBxYuIRAu+xtowwQbx/VOyIZ5ibbM8g4vF7iJCHUMGWlWIh5OaDpChng==
   dependencies:
     ethers "^4.0.27"
     tslib "^1.9.3"
 
-"@layer2/wallet@^0.0.34":
-  version "0.0.34"
-  resolved "https://registry.yarnpkg.com/@layer2/wallet/-/wallet-0.0.34.tgz#ff779e59e6b25abc99a2568666fcf0a275d19b1a"
+"@layer2/wallet@^0.0.39":
+  version "0.0.39"
+  resolved "https://registry.yarnpkg.com/@layer2/wallet/-/wallet-0.0.39.tgz#33151d3eff5f834ad123663065187badcef1de79"
+  integrity sha512-1J+CTHluN3P/2b+qRoHb0Ukpsn30bA3P8uqekBR+k7ImpR0MxdONk+TiXCWd6HPcIjOCdJuNkKOmjgtJ48a0Dg==
   dependencies:
-    "@layer2/core" "^0.0.34"
-    "@layer2/events-watcher" "^0.0.34"
+    "@layer2/core" "^0.0.39"
+    "@layer2/events-watcher" "^0.0.39"
     "@types/chai" "^4.1.7"
     "@types/chai-as-promised" "^7.1.0"
     "@types/mocha" "^5.2.5"

@@ -20,8 +20,10 @@ import {
   fetchBalanceOfMainChain,
   fetchBlockNumber,
   fetchBlock,
+  fetchUserActions,
   updateUTXO,
   deposit,
+  depositERC20,
   verifyHistory,
   startExit,
   getExit,
@@ -42,12 +44,16 @@ class Transfer extends Component {
   }
 
   async componentDidMount() {
-    await this.props.fetchBalanceOfMainChain();
     await this.setState({account: this.props.wallet.getAddress()});
-    await this.props.wallet.init(async (wallet) => {
-      await wallet.syncChildChain()
+    this.props.wallet.on('updated', async (e) => {
+      await e.wallet.syncChildChain()
       this.forceUpdate()
-    })    
+    })
+    await this.props.wallet.init()
+    await this.props.fetchBalanceOfMainChain();
+    await this.props.fetchBalanceOfMainChain(1);
+
+    // this.fetchUserActions()
   }
 
     
@@ -58,6 +64,10 @@ class Transfer extends Component {
   fetchBlock() {
     this.props.fetchBlock(
       this.state.blkNum || this.props.blockNumber);
+  }
+
+  fetchUserActions() {
+    this.props.fetchUserActions(0)
   }
 
   updateUTXO() {
@@ -73,6 +83,10 @@ class Transfer extends Component {
 
   deposit(eth) {
     this.props.deposit(eth);
+  }
+
+  depositTestPlasmaToken(address, amount) {
+    this.props.depositERC20(address, amount);
   }
 
   verify(utxo) {
@@ -133,6 +147,7 @@ class Transfer extends Component {
 
   render() {
     const { account } = this.state;
+    const availableTokens = this.props.wallet.getAvailableTokens()
     return (
       <div className={Styles['header-base']} >
         <Container className={Styles['container-base']}>   
@@ -145,19 +160,19 @@ class Transfer extends Component {
             <Button onClick={this.deposit.bind(this, '0.2')}>Deposit 0.2 ether</Button>
             <Button onClick={this.deposit.bind(this, '0.5')}>Deposit 0.5 ether</Button>
             <Button onClick={this.deposit.bind(this, '1.0')}>Deposit 1 ether</Button>
+            <Button onClick={this.depositTestPlasmaToken.bind(this, 10)}>Deposit 10 ERC20</Button>
           </div>
           <div>{this.getDepositResultMessage()}</div>
           
           <Header as='h2'>Balance</Header>
           {
-            this.props.wallet.getBalance().div(1000000).toString()
+            this.props.wallet.getBalance(0).div(1000000).toString()
           } Finney
           (
           {
             this.props.mainchainBalance ? this.props.mainchainBalance.div(1000000000000000).toString() : 0
           } Finney(Main Chain)
           )
-
           <Divider />
           <div>
             <Header as='h2'>To Address: </Header>
@@ -246,8 +261,10 @@ const mapDispatchToProps = {
   fetchBalanceOfMainChain,
   fetchBlockNumber,
   fetchBlock,
+  fetchUserActions,
   updateUTXO,
   deposit,
+  depositERC20,
   verifyHistory,
   startExit,
   getExit,
@@ -259,6 +276,7 @@ const mapDispatchToProps = {
 
 const mapStateToProps = (state) => ({
   wallet: state.wallet,
+  actions: state.actions,
   balance: state.balance,
   mainchainBalance: state.mainchainBalance,
   blockNumber: state.blockNumber,

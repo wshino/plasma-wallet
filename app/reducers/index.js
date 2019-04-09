@@ -4,6 +4,7 @@ import {
   DEPOSITED,
   FETCH_BLOCK_NUMBER,
   FETCH_BLOCK,
+  FETCH_USER_ACTIONS,
   UPDATE_UTXO,
   SEND_RAW_TRANSACTION,
   FETCH_BALANCE_OF_MAINCHAIN,
@@ -37,6 +38,9 @@ export const handlers = {
     },
     [FETCH_BLOCK]: (state, action) => {
       return { ...state, block: action.payload }
+    },
+    [FETCH_USER_ACTIONS]: (state, action) => {
+      return { ...state, actions: action.payload }
     },
     [UPDATE_UTXO]: (state, action) => {
       return { ...state, utxos: action.payload }

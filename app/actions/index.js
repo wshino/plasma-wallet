@@ -4,6 +4,7 @@ export const WEB3_CONNECTED = 'WEB3_CONNECTED';
 export const FETCH_BALANCE_OF_MAINCHAIN = 'FETCH_BALANCE_OF_MAINCHAIN';
 export const FETCH_BLOCK_NUMBER = 'FETCH_BLOCK_NUMBER';
 export const FETCH_BLOCK = 'FETCH_BLOCK';
+export const FETCH_USER_ACTIONS = 'FETCH_USER_ACTIONS';
 export const UPDATE_UTXO = 'UPDATE_UTXO';
 export const DEPOSITED = 'DEPOSITED';
 export const VERIFY_HISTORY = 'VERIFY_HISTORY';
@@ -58,12 +59,25 @@ export function fetchBlockNumber() {
   };
 }
 
-export function fetchBalanceOfMainChain() {
+export function fetchUserActions() {
   return async (dispatch, getState) => {
     const wallet = getState().wallet;
+    const actions = await wallet.getUserActions(0)
+    console.log('actions', actions)
+    dispatch({
+      type: FETCH_USER_ACTIONS,
+      payload: actions
+    });
+  };
+}
+
+export function fetchBalanceOfMainChain(tokenId) {
+  return async (dispatch, getState) => {
+    const wallet = getState().wallet;
+    console.log(tokenId, await wallet.getBalanceOfMainChain(tokenId))
     dispatch({
       type: FETCH_BALANCE_OF_MAINCHAIN,
-      payload: await wallet.getBalanceOfMainChain()
+      payload: await wallet.getBalanceOfMainChain(tokenId)
     });
   };
 }
@@ -73,6 +87,23 @@ export function deposit(eth) {
   return async (dispatch, getState) => {
     const wallet = getState().wallet;
     const result = await wallet.deposit(eth)
+    dispatch({
+      type: DEPOSITED,
+      payload: result
+    });
+    setTimeout(() => {
+      dispatch({
+        type: DEPOSITED,
+        payload: null
+      });
+    }, 10000)    
+  }
+}
+
+export function depositERC20(address, amount) {
+  return async (dispatch, getState) => {
+    const wallet = getState().wallet;
+    const result = await wallet.depositERC20(address, amount)
     dispatch({
       type: DEPOSITED,
       payload: result
@@ -157,7 +188,7 @@ export function fetchBlock(blkNum) {
 export function transfer(toAddress, amount) {
   return async (dispatch, getState) => {
     const wallet = getState().wallet;
-    const result = await wallet.transfer(toAddress, amount)
+    const result = await wallet.transfer(toAddress, 0, amount)
     dispatch({
       type: SEND_RAW_TRANSACTION,
       payload: result
