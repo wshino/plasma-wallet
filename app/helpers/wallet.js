@@ -1,19 +1,11 @@
 import {
   ChamberWallet,
-  PlasmaClient
+  PlasmaClient,
+  BrowserStorage
 } from '@layer2/wallet';
-import {
-  OwnState
-} from '@layer2/core';
-import {
-  WalletStorage
-} from './storage';
 import {
   JsonRpcClient
 } from './jsonrpc'
-
-// should set up state verifier's address
-OwnState.setAddress('0x9fbda871d559710256a2502a2517b794b482db40')
 
 /**
  * Plasma wallet store UTXO and proof
@@ -23,14 +15,15 @@ export default class WalletFactory {
   static createWallet() {
     const jsonRpcClient = new JsonRpcClient(process.env.CHILDCHAIN_ENDPOINT || 'http://localhost:3000')
     const client = new PlasmaClient(jsonRpcClient)
-    const storage = new WalletStorage()
-    const privateKey = storage.get('privateKey')
+    const storage = new BrowserStorage()
+    const privateKey = localStorage.getItem('privateKey')
     const options = {
       // kovan
       // initialBlock: 10000000,
       initialBlock: process.env.INITIAL_BLOCK || 1,
       interval: 20000,
-      confirmation: process.env.CONFIRMATION || 0
+      confirmation: process.env.CONFIRMATION || 0,
+      OwnershipPredicate: process.env.OWNERSHIP_PREDICATE
     }
     if(privateKey) {
       return ChamberWallet.createWalletWithPrivateKey(
@@ -49,7 +42,7 @@ export default class WalletFactory {
         storage,
         options
       )
-      storage.add('privateKey', wallet.wallet.privateKey)
+      localStorage.setItem('privateKey', wallet.wallet.privateKey)
       location.reload()
       return wallet
     }
