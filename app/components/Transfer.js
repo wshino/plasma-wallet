@@ -51,7 +51,7 @@ class Transfer extends Component {
     })
     await this.props.wallet.init()
     await this.props.fetchBalanceOfMainChain();
-    await this.props.fetchBalanceOfMainChain(1);
+    //await this.props.fetchBalanceOfMainChain(1);
 
     // this.fetchUserActions()
   }
