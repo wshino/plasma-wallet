@@ -16,7 +16,8 @@ import {
 export default class WalletFactory {
 
   static createWallet() {
-    const jsonRpcClient = new JsonRpcClient(process.env.CHILDCHAIN_ENDPOINT || 'http://localhost:3000')
+    const childChainEndpoint = process.env.CHILDCHAIN_ENDPOINT
+    const jsonRpcClient = new JsonRpcClient(childChainEndpoint || 'http://localhost:3000')
     const client = new PlasmaClient(jsonRpcClient, new WalletMQTTClient(process.env.CHILDCHAIN_PUBSUB_ENDPOINT || childChainEndpoint))
     const storage = new BrowserStorage()
     const privateKey = localStorage.getItem('privateKey')
