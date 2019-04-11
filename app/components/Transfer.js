@@ -72,7 +72,7 @@ class Transfer extends Component {
   }
 
   deposit(eth) {
-    this.props.deposit(eth);
+    this.props.deposit(eth).catch((reason => alert(reason)));
   }
 
   verify(utxo) {
